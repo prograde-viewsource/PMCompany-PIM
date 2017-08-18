@@ -1,0 +1,114 @@
+<article id="COMPONENT_Specs" ui-view class="container-fluid">
+    <div class="page-header">
+        <h3>Product Attributes</h3>
+    </div>
+    <!--====== SEARCH/FILTERS ======-->
+    <div class="row">
+        <div class="form-group edit-button-group">
+            <button type="button" class="btn btn-default" ui-sref="^"><i class="fa fa-arrow-left"></i> Back</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 form-group">
+            <label for="groupFilterSelect">Filter by Group:</label>
+            <select id="groupFilterSelect" class="form-control" ng-change="DataJobAssignSpec.research()" ng-options="group for group in DataJobAssignSpec.specGroups" ng-model="DataJobAssignSpec.groupFilter">
+                <option value="">Show All</option>
+            </select>
+
+        </div>
+        <div class="col-md-6">
+            <label>Filter by Search:</label>
+            <div class="form-group">
+                <input type="search" class="form-control" placeholder="Search Product Attributes..." ng-model="DataJobAssignSpec.searchInput" ng-change="DataJobAssignSpec.research()" />
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-xs-6" ng-click="DataJobAssignSpec.toggleListFilter()" ng-init="DataJobAssignSpec.listFilter = true">
+            <div class="btn full-width" ng-class="DataJobAssignSpec.listFilter ? 'btn-primary' : 'btn-default'">Apply filter to Product Attribute list <i class="fa" ng-class="DataJobAssignSpec.listFilter ? 'fa-check-square-o' : 'fa-square-o'" /></div>
+        </div>
+        <div class="col-xs-6" ng-click="DataJobAssignSpec.toggleAssignFilter()" ng-init="DataJobAssignSpec.assignedFilter = true">
+            <div class="btn full-width" ng-class="DataJobAssignSpec.assignedFilter ? 'btn-primary' : 'btn-default'">Apply filter to assigned Product Attributes <i class="fa" ng-class="DataJobAssignSpec.assignedFilter ? 'fa-check-square-o' : 'fa-square-o'" /></div>
+        </div>
+        <br/><br/>
+    </div>
+
+    <!--====== LIST ======-->
+    <div class="row">
+        <div class="col-xs-6">
+
+            <div class='scroll-count'>Showing <strong>{{filter.length}}</strong> of <strong>{{DataJobAssignSpec.list.Items.length}}</strong></div>
+            <section class="table-fixed-header no-margin">
+                <div class="table-header-bg"></div>
+                <div class="table-container" servicename="Specs" ordercloud-infinite-scroll controlleras="DataJobAssignSpec" idname="SpecID" disable-dynamic-validation ng-style="DataJobAssignSpec.leftDragColMaxheight">
+                    <table class="table table-hover">
+                        <colgroup>
+                            <col class="action-column" />
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>
+                                    <div>
+                                        Product Attributes
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody dragula="'spec-bag'" dragula-model="DataJobAssignSpec.list.Items" class="oc-table-responsive">
+                            <tr ng-repeat="spec in DataJobAssignSpec.list.Items | filter: ( DataJobAssignSpec.listFilter ? {xp: {'Group':DataJobAssignSpec.groupFilter.Name}} : null):true | filter: ( DataJobAssignSpec.listFilter ? DataJobAssignSpec.searchFilter : null) | orderBy:'Name' as filter">
+                                <td class="text-center tool-td"><i id="handle" class="fa fa-arrows"></i> <i class="fa fa-caret-right" ng-click="DataJobAssignSpec.pushOver(spec.ID)"></i></td>
+                                <td>{{spec.Name}}</td>
+                            </tr>
+                            <tr ng-if="!DataJobAssignSpec.list.Items.length">
+                                <td class="alert alert-info" colspan="2">No matches found.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- End height limited left dragula column -->
+
+
+        </div>
+        <div class="col-xs-6">
+            <div class='scroll-count'>Showing <strong>{{DataJobAssignSpec.DataJob.xp.specAssignments.Items.length}}</strong> of <strong>{{DataJobAssignSpec.DataJob.xp.specAssignments.Items.length > 0 ? DataJobAssignSpec.DataJob.xp.specAssignments.Items.length  : 0 }}</strong></div>
+
+            <section class="table-fixed-header no-margin">
+                <div class="table-header-bg"></div>
+                <div class="table-container" servicename="Specs" controlleras="DataJobAssignSpec" idname="SpecID" disable-dynamic-validation ng-style="DataJobAssignSpec.leftDragColMaxheight">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th colspan="2"></th>
+                                <th>
+                                    <div>
+                                        Product Attributes
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tr style="background: #e2ecef;">
+                            <td class="text-center tool-td"><i style="color: #8b8b8b;" class="fa fa-lock"></i></td>
+                            <td class="text-center" style="color: #9e9a9a; width: 50px; font-size: 11px; "> {{ DataJobAssignSpec.colLetter(0) }} </td>
+                            <td>{{'Part Number' | i18next}}</td>
+                        </tr>
+                        <tbody dragula="'spec-bag'" dragula-model="DataJobAssignSpec.DataJob.xp.specAssignments" id="right-drag-col">
+                            <tr ng-repeat="spec in DataJobAssignSpec.DataJob.xp.specAssignments.Items | filter: ( DataJobAssignSpec.assignedFilter ? {xp: {'Group':DataJobAssignSpec.groupFilter.Name}} : null):true | filter: ( DataJobAssignSpec.assignedFilter ? DataJobAssignSpec.searchFilter : null) track by $index">
+                                <td class="text-center tool-td"><i id="handle" class="fa fa-arrows"></i> <i class="fa fa-caret-left" ng-click="DataJobAssignSpec.pushBack(spec.ID)"></i></td>
+                                <td class="text-center" style="color: #9e9a9a; width: 50px; font-size: 11px; "> {{ DataJobAssignSpec.colLetter($index + 1) }} </td>
+                                <td>{{spec.Name}}</td>
+                            </tr>
+                            <tr ng-if="DataJobAssignSpec.DataJob.xp.specAssignments.length == 0">
+                                <td colspan="2" class="alert alert-info">No matches found. Drag and arrange Product Attributes here.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+        </div>
+    </div>
+    </div>
+</article>

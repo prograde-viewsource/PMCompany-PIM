@@ -1,0 +1,18 @@
+{
+  "name": "angular-dragula",
+  "version": "1.2.8",
+  "description": "Drag and drop so simple it hurts",
+  "main": [
+    "dist/angular-dragula.js",
+    "dist/dragula.css"
+  ],
+  "ignore": [],
+  "homepage": "https://github.com/bevacqua/angular-dragula",
+  "authors": [
+    "Nicolas Bevacqua <nicolasbevacqua@gmail.com>"
+  ],
+  "license": "MIT",
+  "_source": "C:\\Users\\cib.PROGRADE\\Dropbox\\Work\\Prograde\\Development\\Harris-Admin-App\\custom_components\\angular-dragula",
+  "_target": "*",
+  "_originalSource": "./custom_components/angular-dragula"
+}

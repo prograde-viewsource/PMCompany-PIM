@@ -1,0 +1,37 @@
+<div ng-show="!DataJobProcess.DataJob.xp['Results']">
+    <h3 class="page-header">
+        <b>Process Data Job:</b> {{DataJobProcess.DataJobName}}
+    </h3>
+    <strong>Description:</strong> {{DataJobProcess.DataJob.Description}}
+    <form name="DataJobProcessForm" ng-submit="DataJobProcess.Submit()" novalidate>
+        <br/>
+        <datajob-upload model="DataJobProcess.DataJob.xp" multiple="multiple" label="Upload Excel Sheet" extensions="xls,xlsx,csv"></datajob-upload>
+       
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary" ng-disabled="DataJobEdit.$invalid">Process</button>
+            <button type="button" class="btn btn-default" ui-sref="^">Cancel</button>
+            <button type="button" class="btn btn-default" ng-click="DataJobProcess.Delete()"><i class="fa fa-trash text-danger"></i></button>
+        </div>
+    </form>
+</div>
+</div>
+
+<div ng-show="DataJobProcess.DataJob.xp['Results']">
+    <h3 class="page-header">
+        <b>Data Job Results:</b> {{DataJobProcess.DataJobName}}
+    </h3>
+    <div><strong>{{DataJobProcess.DataJobName}}</strong> was sucsessfully completed on <strong>{{DataJobProcess.DataJob.xp['Results']['Completed']}}</strong> by <strong>{{DataJobProcess.DataJob.xp['Results']['ProcessedBy']}}</strong>
+    <br/><br/>
+    <div>
+         <datajob-upload model="DataJobProcess.DataJob.xp" multiple="multiple" label="Excel Sheet" extensions="xls,xlsx,csv"></datajob-upload>
+        <strong>Products Affected: </strong> {{DataJobProcess.DataJob.xp['Results']['ProductCount']}} <br/><br/>
+        <strong>Specs Affected: </strong> {{DataJobProcess.DataJob.xp['Results']['SpecCount']}} <br/><br/>
+        <strong>Errors: </strong> {{DataJobProcess.DataJob.xp['Results']['ErrorCount']}} <br/><br/>
+        <pre  ng-show="DataJobProcess.DataJob.xp['Results']['ErrorCount']"><strong>Errors:</strong><div ng-repeat="err in DataJobProcess.DataJob.xp['Results']['Errors']">{{err}}</div></pre>
+    </div>
+     <button type="button" class="btn btn-default" ui-sref="^">Close</button>
+    </div>
+
+
+</form>
+</div>

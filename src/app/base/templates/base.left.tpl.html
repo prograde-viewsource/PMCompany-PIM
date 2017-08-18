@@ -1,0 +1,23 @@
+<aside id="BASE_LEFT" snap-drawer class="hidden-print">
+
+    <!-- <a href="" ui-sref="home">--><img src="http://gmicompanies.com/wp-content/uploads/2014/06/GMi-Logo-52px.png" class="img-responsive" />
+    <nav ng-if="base.catalogItems.length">
+        <h4 class="text-primary"><b>&nbsp;</b></h4>
+        <ul class="nav nav-pills nav-stacked">
+             <li role="presentation" ng-repeat="item in base.catalogItems | orderBy:'OrderIndex'" ui-sref-active="active" ng-hide="item.Display == 'Users' && !base.superAdmin">
+                <a href="" ui-sref="{{item.StateRef}}">{{item.Display | i18next}}</a>
+            </li>
+            <li ng-show="application.signalrActive">
+                <!--<i class="fa fa-exclamation-circle"></i>-->
+                <div class="spinner">
+                    Processing changes...<br />
+                    <div class="rect1"></div>
+                    <div class="rect2"></div>
+                    <div class="rect3"></div>
+                    <div class="rect4"></div>
+                    <div class="rect5"></div>
+                </div>
+            </li>
+        </ul>
+    </nav>
+ 

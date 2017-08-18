@@ -1,0 +1,192 @@
+<h3 class="page-header">
+    <b>{{'New Product' | i18next}}</b>
+</h3>
+<form name="CreateForm" ng-submit="productCreate.Submit(true)" novalidate>
+    <div class="row">
+        <div class="form-group edit-button-group">
+            <a class="btn btn-primary" ng-disabled="CreateForm.$invalid" ng-click="CreateForm.$valid && productCreate.Submit(false)">Save</a>
+            <a class="btn btn-primary" ng-disabled="CreateForm.$invalid" ng-click="CreateForm.$valid && productCreate.Submit(true)">Save & Close</a>
+            <button type="button" class="btn btn-default" ui-sref="^">Cancel</button>
+            <!--<button type="button" ng-click="productCreate.productCornucopia()" class="btn btn-primary">Create Tons of Products</button>-->
+        </div>
+    </div>
+    <em>* Required fields</em><br/><br/>
+    <div class="row">
+        <div class="form-group col-sm-6">
+            <label for="productIDInput">{{'Product Number' | i18next}}*</label>
+            <input id="productIDInput" type="text" class="form-control" pattern="([A-Za-z0-9-_\/]+)" pattern-err-type="ID_Name" ng-model="productCreate.product.ID" ng-required="true" parse-slash />
+        </div>
+        <div class="col-sm-6 form-group">
+            <label for="productSAPDescriptionInput">{{'ERP Description' | i18next}}*</label>
+            <input id="productSAPDescriptionInput" type="text" ng-if="!productCreate.erp_as_product_name" type="text" class="form-control" ng-required="true" ng-model="productCreate.product.xp['SAP-Description']"></textarea>
+            <input id="productSAPDescriptionInput" type="text" ng-if="productCreate.erp_as_product_name" type="text" class="form-control" ng-required="true" ng-model="productCreate.product.Name"></textarea>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 form-group">
+            <label for="productDescriptionInput">{{'Long Description' | i18next}}</label>
+            <textarea id="productDescriptionInput" type="text" class="form-control" ng-model="productCreate.product.Description"></textarea>
+        </div>
+    </div>
+    <div class="row">
+
+        <div class="col-sm-6 form-group">
+            <label ng-if="!productCreate.erp_as_product_name" for="productNameInput">{{'Short Description' | i18next}}*</label>
+            <input ng-if="!productCreate.erp_as_product_name" id="productNameInput" type="text" class="form-control" ng-model="productCreate.product.Name" ng-required="true" parse-slash />
+
+            <label ng-if="productCreate.erp_as_product_name" for="productNameInput">{{'Short Description' | i18next}}</label>
+            <input ng-if="productCreate.erp_as_product_name" id="productNameInput" type="text" class="form-control" ng-model="productCreate.product.xp['Short-Description']" ng-required="false" parse-slash />
+
+
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 form-group">
+            <label for="productStatusInput">{{'Status' | i18next}}*</label>
+            <select id="productStatusInput" class="form-control" ng-model="productCreate.product.xp.Status" ng-required="true">
+           <option ng-repeat="opt in productCreate.options.product_status" value="{{opt[0]}}">{{opt[1] | i18next}}</option>
+            </select>
+        </div>
+        <div class="col-md-6 form-group">
+            <label for="productBrandInput">{{'Brand Name' | i18next}}</label>
+            <select id="productStatusInput" class="form-control" ng-model="productCreate.product.xp['Brand-Name']" ng-required="false">
+                            <option ng-repeat="opt in productCreate.options.brands" value="{{opt[0]}}">{{opt[1] | i18next}}</option>
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 form-group">
+            <label for="productUPCInput">{{'UPC' | i18next}}</label>
+            <input id="productUPCInput" type="text" class="form-control" ng-model="productCreate.product.xp['UPC-Each']" />
+        </div>
+        <div class="col-md-6 form-group">
+            <label for="productGroupInput">{{'Product Group' | i18next}}</label>
+            <div class="row">
+                <div class="col-xs-12 col-sm-7">
+                    <select id="productGroupInput" class="form-control" ng-model="productCreate.product.xp['Product-Group']" ng-required="false" ng-options="option.ID as option.Name for option in productCreate.productGroupOptions.Items" />
+                </div>
+                <div class="col-xs-12 col-sm-5">
+                    <a class="btn btn-default form-control" ng-click="productCreate.applyGroup()">{{'Apply Group' | i18next}}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 form-group" ng-if="productCreate.noSpecs">
+            <div class="alert alert-warning" style="text-align: center">
+                <strong>Warning!</strong> The selected Product Group has no attributes assigned to it.
+            </div>
+        </div>
+        <div class="col-md-12 form-group">
+            <uib-accordion close-others="true">
+
+                <div uib-accordion-group class="panel-default" template-url="products/templates/groupHeaderTemplate.tpl.html" heading="{{group.Name}}" ng-repeat="group in productCreate.specGroups | orderBy:productCreate.CustomListOrder">
+                    <div ng-repeat="spec in group.Specs | orderBy: '-Name'">
+                        <div class="form-group col-sm-10">
+                            <label style="display: block" ng-if="spec.OptionCount == 0 || (spec.OptionCount > 0 && !spec.xp.Multiselect)">{{spec.Name}}<span ng-show="spec.Required">*</span></label>
+
+                            <input type="text" class="form-control" user-permissions pbit="4" pobj="{{group.Name}}" ng-model="spec.Assignment.DefaultValue" ng-if="spec.OptionCount == 0 && !spec.xp.isMediaAttribute" />
+
+                            <input type="text" readonly="true" class="form-control" user-permissions pbit="4" pobj="{{group.Name}}" ng-model="spec.Assignment.DefaultValue" ng-if="spec.OptionCount == 0 && spec.xp.isMediaAttribute" style="display: inline; width: 70%;" />
+
+                            <div class="btn btn-default" user-permissions pbit="4" pobj="{{group.Name}}" ng-click="productCreate.OpenAssetManager(spec)" style="display: inline;" ng-if="spec.OptionCount == 0 && spec.xp.isMediaAttribute">{{'Open File Viewer' | i18next}}</div>
+
+                            <select type="text" class="form-control" user-permissions pbit="4" pobj="{{group.Name}}" ng-options="option.ID as option.Value for option in spec.xp.Options | orderBy: 'Value'" ng-model="spec.Assignment.DefaultOptionID" ng-if="spec.OptionCount > 0 && !spec.xp.Multiselect"></select>
+
+                            <div close-others="false" ng-if="spec.OptionCount > 0 && spec.xp.Multiselect && !spec.xp.isMediaAttribute">
+
+                                <label>{{spec.Name}}</label>
+                                <br/>
+                                <label ng-repeat="option in spec.xp.Options track by $index" style="font-weight: normal">
+                                        <input name="{{'option_' + $index}}" user-permissions pbit="4" pobj="{{group.Name}}"  type="checkbox" class="form-control" ng-change="productCreate.updateMultiSelect(spec)" ng-model="productCreate.multiSelects[spec.ID][option.ID]" style="width: 15px;box-shadow: none;     height: 15px;">&nbsp;{{option.Value}}
+                                     <br/>
+                                    </label>
+
+                            </div>
+                        </div>
+                    </div>
+            </uib-accordion>
+            </div>
+        </div>
+        <!--<div class="row">-->
+        <div class="ng-hide">
+            <label for="productQuantityMultInput">Quantity Multiplier</label>
+            <input id="productQuantityMultInput" type="number" pattern="^[0-9]*[1-9][0-9]*$" pattern-err-type="positiveInteger" ng-init="productCreate.product.QuantityMultiplier = 1" class="form-control" ng-model="productCreate.product.QuantityMultiplier" ng-required="true"
+            />
+        </div>
+        <!--
+        <div class="form-group col-sm-6">
+            <label for="productShipWeightInput">Ship Weight</label>
+            <input id="productShipWeightInput" type="number" step="any" class="form-control" ng-model="productCreate.product.ShipWeight"/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6 form-group">
+            <label for="productTypeInput">Product Type</label>
+            <select id="productTypeInput" class="form-control" ng-model="productCreate.product.Type" ng-required="true">
+                <option value="Static">Static</option>
+                <option value="VariableText">Variable Text</option>
+                <option value="Kit">Kit</option>
+            </select>
+        </div>
+        <div class="form-group col-sm-6">
+            <label for="productInventoryInput">Inventory Notification Point</label>
+            <input id="productInventoryInput" type="number" class="form-control" ng-model="productCreate.product.InventoryNotificationPoint"/>
+        </div>
+    </div>
+    <div class="panel panel-default col-sm-6">
+        <div class="panel-body">
+            <div class="row">
+                <div class="form-group col-sm-6">
+                    Inventory Options:
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6 form-group">
+                    <label for="productInventory2Input">
+                        <input id="productInventory2Input" type="checkbox" ng-model="productCreate.product.InventoryEnabled"/>
+                        Track Inventory
+                    </label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6 form-group">
+                    <label for="productInventory3Input">
+                        <input id="productInventory3Input" type="checkbox" ng-model="productCreate.product.VariantLevelInventory"/>
+                        Variant Level Inventory
+                    </label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6 form-group">
+                    <label for="productInventory4Input">
+                        <input id="productInventory4Input" type="checkbox" ng-model="productCreate.product.ExceedInventory"/>
+                        Can Exceed Inventory
+                    </label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6 form-group">
+                    <label for="productInventory5Input">
+                        <input id="productInventory5Input" type="checkbox" ng-model="productCreate.product.DisplayInventory"/>
+                        Display Inventory
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <ordercloud-file-upload model="productCreate.product" keyname="image" label="Image" extensions="jpg, png, gif, jpeg, tiff"></ordercloud-file-upload>
+    </div>
+    
+    <div class="row">
+        <div class="form-group col-sm-12">
+            <label for="productActiveInput">
+                <input id="productActiveInput" type="checkbox" ng-model="productCreate.product.Active"/>
+                Active
+            </label>
+        </div>
+    </div>-->
+</form>

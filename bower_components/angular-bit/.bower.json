@@ -1,0 +1,18 @@
+{
+  "name": "angular-bit",
+  "version": "1.0.2",
+  "description": "AngularJS directives for Bitwise operations and controls",
+  "main": "src/angular-bit.js",
+  "license": "MIT",
+  "homepage": "https://github.com/taranais/angular-bit",
+  "_release": "1.0.2",
+  "_resolution": {
+    "type": "version",
+    "tag": "1.0.2",
+    "commit": "be643347b4811dd3cf0aabca138922740f68bd88"
+  },
+  "_source": "https://github.com/taranais/angular-bit.git",
+  "_target": "^1.0.2",
+  "_originalSource": "angular-bit",
+  "_direct": true
+}

@@ -1,0 +1,50 @@
+<div class="modal-body">
+    <form name="ConfirmPasswordForm" ng-submit="confirmPassword.submit()">
+        <div class="form-group">
+            <H2>{{'Audit Log Details' | i18next}}</H2>
+            <br/>
+             <h4>Details</h4>
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table oc-table-responsive">
+                        <tr>
+                            <td><strong>Date</strong></td>
+                            <td> {{auditDetail.log.TimeStamp}}</td>
+                        </tr>
+                                   <tr>
+                            <td><strong>User</strong></td>
+                            <td> {{auditDetail.log.UserID}}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Operation</strong></td>
+                            <td> {{auditDetail.log.Operation}}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Description</strong></td>
+                            <td> {{auditDetail.log.Description}}</td>
+                        </tr>
+             
+                    </table>
+               </div>     
+           </div>
+       
+            <h4>Items Affected</h4>
+            <hr>
+            <ol><li  ng-repeat="target in auditDetail.log.Targets">
+                <span ng-show="target.TargetID"><strong>Item ID: </strong>{{target.TargetID}}<br></span>
+                <span ng-show="target.Name"><strong>Item Name: </strong>{{target.Name}}<br></span>
+                 <span ng-show="target.Type"><strong>Item Type: </strong>{{target.Type}}<br></span>
+                  <span ng-show="target.PreviousState"><strong>Previous Value: </strong>{{target.PreviousState}}<br></span>
+                   <span ng-show="target.NewState"><strong>New Value: </strong>{{target.NewState}}<br></span><br>
+           </li>
+           
+           </ol>
+
+        <hr>
+        </div>
+       
+        <button class="btn btn-default" type="button" ng-click="confirmPassword.cancel()">{{'Close' | i18next}}</button>
+    </form>
+</div>
+
+

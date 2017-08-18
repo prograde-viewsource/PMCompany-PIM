@@ -1,0 +1,56 @@
+{
+    "appname": "PM Company Product Information Management",
+    "appversion": "v1.1.0",
+    "ocscope": "ProductAdmin ProductReader InventoryAdmin ProductAssignmentAdmin BuyerAdmin BuyerReader CatalogAdmin CatalogReader CategoryAdmin CategoryReader AddressAdmin AddressReader CostCenterAdmin CostCenterReader PromotionAdmin PromotionReader CreditCardAdmin CreditCardReader MessageConfigAssignmentAdmin OrderAdmin OrderReader UnsubmittedOrderReader PriceScheduleAdmin PriceScheduleReader SpendingAccountAdmin SpendingAccountReader BuyerUserAdmin BuyerUserReader UserGroupAdmin UserGroupReader ApprovalRuleAdmin ApprovalRuleReader PermissionAdmin AdminUserAdmin AdminUserReader AdminUserGroupAdmin AdminUserGroupReader MeAdmin MeXpAdmin MeAddressAdmin MeCreditCardAdmin OverrideUnitPrice OverrideShipping OverrideTax SetSecurityProfile Create Security Profile",
+    "clientid": "E31445AA-4EF1-4D32-B10F-1359FE5DEC5E",
+    "clientsecret": "5BBF0C0590",
+    "buyerid": null,
+    "environment": "prod",
+    "erp_as_product_name": false,
+    "asset_manager": false,
+    "base": {
+        "left": true,
+        "right": false,
+        "top": true,
+        "bottom": false
+    },
+    "protected_fields": [],
+    "option_list": {
+        "spec_groups": ["Basic Attributes", "Marketing Copy", "Media", "Ordering Specs", "Regulation Specs", "Shipping Specs", "Technical Specs", "Pricing"],
+        "product_status": [
+            ["New", "New"],
+            ["Active", "Active"],
+            ["Discontinue", "Discontinue"],
+            ["Discontinued", "Discontinued"],
+            ["Obsolete", "Delete"]
+        ],
+        "buyer_types": [
+            ["Dealer", "Dealer"],
+            ["Internal", "Internal"]
+        ],
+        "brands": [
+            ["GHENT", "Ghent"],
+            ["WADDELL", "Waddell"],
+            ["VIVIDBOARD", "VividBoard"]
+        ],
+        "search_by": [
+            [null, "Basic Attributes"],
+            ["id", "Part Number"],
+            ["xp.Master-Product-Group-XP", "Search Group"]
+        ]
+    },
+    "audit_settings": {
+        "enabled": true,
+        "url": "https://pimaudit.azurewebsites.net/api/AuditLogs"
+    },
+    "static_template_headers_map": [
+        ["ID", "Item Number"],
+        ["Name", "Short Description"],
+        ["Description", "Long Description"],
+        ["xp.Status", "Status"],
+        ["xp.UPC-Each", "UPC"],
+        ["xp.Product-Group", "Product Group"],
+        ["xp.Brand-Name", "Brand Name"]
+    ]
+
+}

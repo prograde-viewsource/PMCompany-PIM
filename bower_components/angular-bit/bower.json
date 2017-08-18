@@ -1,0 +1,8 @@
+{
+  "name": "angular-bit",
+  "version": "1.0.0",
+  "description": "AngularJS directives for Bitwise operations and controls",
+  "main": "src/angular-bit.js",
+  "license": "MIT",
+  "homepage": "https://github.com/taranais/angular-bit"
+}

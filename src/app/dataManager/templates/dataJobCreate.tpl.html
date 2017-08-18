@@ -1,0 +1,33 @@
+<h3 class="page-header">
+    <b>New Data Job</b>
+</h3>
+<form name="DataJobCreateForm" ng-submit="DataJobCreate.Submit(true)" novalidate>
+    <div class="row">
+        <div class="form-group edit-button-group">
+            <button type="button" class="btn btn-primary" ng-click="DataJobCreate.Submit(false)" ng-disabled="DataJobCreateForm.$invalid">Save</button>
+            <button type="submit" class="btn btn-primary" ng-disabled="DataJobCreate.$invalid">Save & Close</button>
+            <button type="button" class="btn btn-default" ui-sref="^">Cancel</button>
+        </div>
+    </div>
+    <em>* Required fields</em><br/><br/>
+    <div class="row">
+        <div class="form-group col-sm-6">
+            <label for="templateName">Type*</label><br>
+            <select class="form-control" ng-model="DataJobCreate.DataJob.xp['Type']" ng-required="true">
+                <option selected="true" value="Bulk Product Attribute Updates">Bulk Product Attribute Updates</option>
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-sm-6">
+            <label for="templateName">Title*</label><br>
+            <input id="templateName" type="text" class="form-control" ng-model="DataJobCreate.DataJob.Name" ng-required="true" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-sm-6">
+            <label for="templateDesc">Description*</label><br>
+            <textarea multiline="true" id="templateName" class="form-control" ng-model="DataJobCreate.DataJob.Description" ng-required="true" />
+        </div>
+    </div>
+</form>

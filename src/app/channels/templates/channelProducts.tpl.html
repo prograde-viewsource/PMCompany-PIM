@@ -1,0 +1,151 @@
+<h3 class="page-header">
+    <b>{{'Assign Products to Channel' | i18next}}:</b> {{channelProducts.buyerName}}
+</h3>
+<div class="row">
+    <div class="form-group edit-button-group">
+        <button type="button" class="btn btn-default" ui-sref="^"><i class="fa fa-arrow-left"></i> Back</button>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6 form-group">
+        <label for="productGroupFilter">Filter by Group:</label>
+        <select id="productGroupFilter" class="form-control" ng-model="channelProducts.groupFilter" ng-change="channelProducts.research()" ng-options="option.ID as option.Name group by option.Type for option in channelProducts.productGroups">
+            <option value="">Show All</option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label>Filter by Search:</label>
+        <div class="form-group">
+            <input type="search" class="form-control" placeholder="Search Products..." ng-model="channelProducts.searchFilter" ng-change="channelProducts.research()" parse-slash />
+        </div>
+    </div>
+         <div class="col-md-2 form-group">
+             
+            <div class="col-md-1" style="padding: 0px; margin-top:25px;">
+                <div style="position: relative; left: -13px; top: 6px;"><strong>by</strong></div>
+                </div>
+            <div class="col-md-11" style="padding: 0px; margin-top:25px;">
+                <select id="statusFilter" class="form-control"  ng-model="channelProducts.searchby" ng-change="channelProducts.research()">
+                    <option ng-repeat="opt in channelProducts.options.search_by" value="{{opt[0]}}">{{opt[1] | i18next}}</option>
+                </select>
+            </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6 form-group">
+        <label for="statusFilter">{{'Filter by Status' | i18next}}:</label>
+        <select id="statusFilter" class="form-control" ng-model="channelProducts.statusFilter" ng-change="channelProducts.research()">
+             <option value="">{{'Show All' | i18next}}</option>
+           <option ng-repeat="opt in channelProducts.options.product_status | orderBy: opt[1]" value="{{opt[0]}}">{{opt[1] | i18next}}</option>
+        </select>
+    </div>
+    <div class="col-md-6 form-group">
+        <label>Filter by Brand:</label>
+        <select id="brandFilter" class="form-control" ng-model="channelProducts.brandFilter" ng-change="channelProducts.research()">
+             <option value="">{{'Show All' | i18next}}</option>
+           <option ng-repeat="opt in channelProducts.options.brands | orderBy: opt[1]" value="{{opt[0]}}">{{opt[1] | i18next}}</option>
+        </select>
+    </div>
+</div>
+<br />
+<div class="row">
+    <div class="col-xs-6" ng-click="channelProducts.toggleListFilter()" ng-init="channelProducts.listFilter = true">
+        <div class="btn full-width" ng-class="channelProducts.listFilter ? 'btn-primary' : 'btn-default'">Apply filter to Product list <i class="fa" ng-class="channelProducts.listFilter ? 'fa-check-square-o' : 'fa-square-o'" /></div>
+    </div>
+    <div class="col-xs-6" ng-click="channelProducts.toggleAssignFilter()" ng-init="channelProducts.assignedFilter = true">
+        <div class="btn full-width" ng-class="channelProducts.assignedFilter ? 'btn-primary' : 'btn-default'">Apply filter to assigned Products <i class="fa" ng-class="channelProducts.assignedFilter ? 'fa-check-square-o' : 'fa-square-o'" /></div>
+    </div>
+    <br /> <br />
+</div>
+
+<div class="row">
+    <div class="col-xs-6">
+        <div class='scroll-count'>Showing <strong>{{channelProducts.list.Items.length}}</strong> of <strong>{{channelProducts.list.Meta.TotalCount - channelProducts.assignments.Meta.TotalCount > 0 ? channelProducts.list.Meta.TotalCount - channelProducts.assignments.Meta.TotalCount : 0}}</strong></div>
+        <section class="table-fixed-header no-margin">
+            <div class="table-header-bg"></div>
+            <div class="table-container" ordercloud-infinite-scroll servicename="products" controlleras="channelProducts" pagingfunction="listPagingFunction" idname="productID" disable-dynamic-validation ng-style="channelProducts.leftDragColMaxheight">
+                <table class="table table-hover">
+                    <colgroup ng-if="channelProducts.list.Items.length">
+                        <col class="action-column" />
+                    </colgroup>
+                    <thead ng-if="channelProducts.list.Items.length">
+                        <tr>
+                            <th class="tool-th">
+                                <div class="tool-div">
+                                    <span class="select-all" ng-click="channelProducts.selectAll()">Assign All <i class="fa fa-caret-right"></i></span>
+                                </div>
+                            </th>
+                            <th>
+                                <div>
+                                    Part Number
+                                </div>
+                            </th>
+                            <th>
+                                <div>
+                                    Products
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody dragula="'prod-bag'" dragula-model="channelProducts.list.Items" class="oc-table-responsive">
+                        <tr ng-repeat="product in channelProducts.list.Items | filter: ( channelProducts.listFilter ? {xp: {'Group':channelProducts.groupFilter.Name}} : null):true | filter: ( channelProducts.listFilter ? channelProducts.searchFilter : null) | orderBy:'Name'   track by $index">
+                            <td class="text-center tool-td"><i id="handle" class="fa fa-arrows"></i> <i class="fa fa-caret-right" ng-click="channelProducts.pushOver(product)"></i>
+                                <td data-title="ID" class="part-number-td">{{product.ID | slashify}}</td>
+                                <td data-title="Name">{{product.Name | slashify}}</td>
+                        </tr>
+                        <tr ng-if="!channelProducts.list.Items.length">
+                            <td class="alert alert-info" colspan="3" style="text-align: center;">No matches found.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </section>
+    </div>
+    <div class="col-xs-6">
+        <div class='scroll-count'>Showing <strong>{{channelProducts.assignments.Items.length}}</strong> of <strong>{{channelProducts.assignments.Meta.TotalCount}}</strong></div>
+        <section class="table-fixed-header no-margin">
+            <div class="table-header-bg"></div>
+            <div class="table-container" ordercloud-infinite-scroll servicename="products" controlleras="channelProducts" idname="productID" pagingfunction="assignmentPagingFunction" disable-dynamic-validation ng-style="channelProducts.leftDragColMaxheight">
+                <table class="table table-hover">
+                    <colgroup ng-if="channelProducts.assignments.Items.length">
+                        <col class="action-column" />
+                    </colgroup>
+                    <thead ng-if="channelProducts.assignments.Items.length">
+                        <tr>
+                            <th class="tool-th">
+                                <div class="tool-div" style="left: 5px;">
+                                    <span class="select-all" ng-click="channelProducts.deselectAll()">Unassign All <i class="fa fa-caret-left"></i></span>
+                                </div>
+                            </th>
+                            <th>
+                                <div>
+                                    Part Number
+                                </div>
+                            </th>
+                            <th>
+                                <div>
+                                    Products
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody dragula="'prod-bag'" dragula-model="channelProducts.assignments.Items" class="oc-table-responsive" id="right-drag-col">
+                        <tr ng-repeat="product in channelProducts.assignments.Items ">
+                            <td class="text-center tool-td"><i id="handle" class="fa fa-arrows"></i> <i class="fa fa-caret-left" ng-click="channelProducts.pushBack(product)"></i>
+                                <td data-title="ID" class="part-number-td">{{product.ID | slashify}}</td>
+                                <td data-title="Name">{{product.Name | slashify}}</td>
+                        </tr>
+                        <tr ng-if="!channelProducts.assignments.Items.length">
+                            <td class="alert alert-info" colspan="3" style="text-align: center;">No matches found.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>
+<div class="form-group">
+    <br/><br/>
+
+</div>

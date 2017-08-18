@@ -1,0 +1,39 @@
+<h3 class="page-header">
+    <b>New Product Group</b>
+</h3>
+<form name="productgroupsCreateForm" ng-submit="productgroupsCreate.Submit(true)" novalidate>
+    <div class="row">
+        <div class="form-group edit-button-group">
+            <button type="button" class="btn btn-primary" ng-click="productgroupsCreate.Submit(false)" ng-disabled="productgroupsCreateForm.$invalid">Save</button>
+            <button type="submit" class="btn btn-primary" ng-disabled="productgroupsCreateForm.$invalid">Save & Close</button>
+            <button type="button" class="btn btn-default" ui-sref="^">Cancel</button>
+        </div>
+    </div>
+    <em>* Required fields</em><br/><br/>
+    <div class="row">
+        <div class="form-group col-sm-6">
+            <label for="templateName">Product Group Name*</label>
+            <input id="templateName" type="text" class="form-control" ng-model="productgroupsCreate.category.Name" ng-required="true" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-sm-6">
+            <label for="templateName">Master Product Group</label>
+            <select id="MasterProductGroup" class="form-control" ng-model="productgroupsCreate.SelectedGroup">
+                 <option ng-repeat="opt in productgroupsCreate.MasterProductGroup" value="{{opt.ID}}" ng-selected="productgroupsEdit.category.xp.Master-Group.ID == opt.ID">{{opt.Name | i18next}}</option>
+            </select>
+        </div>
+    </div>
+    <div class="row" style="Display: none">
+        <div class="form-group col-sm-6">
+            <label for="categoryActiveInput">
+                <input id="categoryActiveInput" type="checkbox" ng-model="productgroupsCreate.category.Active"/>
+                Active
+            </label>
+        </div>
+    </div>
+    <!--<br /><br /><btn class="btn btn-primary" data-toggle="collapse" data-target="#rawData">Debug: Show Raw Data</btn>
+<div id="rawData" class="collapse">
+        <pre><code>{{productgroupsCreate.category}}</code></pre>
+</div>-->
+</form>

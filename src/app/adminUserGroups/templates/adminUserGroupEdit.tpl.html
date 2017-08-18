@@ -1,0 +1,142 @@
+<h3 class="page-header">
+    <b>Edit User Groups: </b> {{adminUserGroupEdit.adminUserGroupName}}
+</h3>
+<form name="adminUserGroupEditForm" ng-submit="adminUserGroupEdit.Submit()" novalidate>
+    <div class="row">
+        <div class="form-group edit-button-group">
+            <button type="submit" class="btn btn-primary" ng-disabled="adminUserGroupEditForm.$invalid">Save & Close</button>
+            <button type="button" class="btn btn-default" ui-sref="^">Cancel</button>
+            <button type="button" class="btn btn-default" ng-click="adminUserGroupEdit.Delete()"><i class="fa fa-trash text-danger"></i></button>
+        </div>
+    </div>
+    <em>* Required fields</em><br/><br/>
+    <div class="row">
+        <div class="form-group col-sm-6">
+            <label for="AdminUserGroupIDInput">User Group ID*</label>
+            <input id="AdminUserGroupIDInput" type="text" class="form-control" pattern="([A-Za-z0-9\-\_]+)" pattern-err-type="ID_Name" ng-model="adminUserGroupEdit.adminUserGroup.ID" ng-required="true" />
+        </div>
+        <div class="form-group col-sm-6">
+            <label for="AdminUserGroupNameInput">User Group Name*</label>
+            <input id="AdminUserGroupNameInput" type="text" class="form-control" ng-model="adminUserGroupEdit.adminUserGroup.Name" required="true" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="AdminUserGroupDescriptionInput">Description</label>
+        <textarea id="AdminUserGroupDescriptionInput" type="text" class="form-control" ng-model="adminUserGroupEdit.adminUserGroup.Description"></textarea>
+    </div>
+    <div class="form-group col-sm-12">
+        <div class="form-group col-sm-6">
+
+            <h4>Permissions</h4>
+            <table class="table table-hover oc-table-responsive" style="text-align: center; margin: 0 auto;">
+                <thead>
+                    <tr>
+                        <th scope="col">
+                            Permission
+                        </th>
+                        <th scope="col" style="text-align: center">
+                            Read
+                        </th>
+                        <th scope="col" style="text-align: center">
+                            Create
+                        </th>
+                        <th scope="col" style="text-align: center">
+                            Update
+                        </th>
+                        <th scope="col" style="text-align: center">
+                            Delete
+                        </th>
+                        <th scope="col" style="text-align: center">
+                            Execute
+                        </th>
+                        <th scope="col" style="text-align: center">
+
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #efefef; padding: 10px 0;">
+                        <td scope="col" style="text-align: left; width: 200px;">
+                            <strong>Add to All</strong>
+                        </td>
+                        <td scope="col" style="text-align: center; width: 100px;">
+                            <input ng-model="adminUserGroupEdit.readAll" ng-click="adminUserGroupEdit.checkAll(adminUserGroupEdit.readAll, 4)" type="checkbox">
+                        </td>
+                        <td scope="col" style="text-align: center; width: 100px;">
+                            <input ng-model="adminUserGroupEdit.createAll" ng-click="adminUserGroupEdit.checkAll(adminUserGroupEdit.createAll, 3)" type="checkbox">
+                        </td>
+                        <td scope="col" style="text-align: center; width: 100px;">
+                            <input ng-model="adminUserGroupEdit.updateAll" ng-click="adminUserGroupEdit.checkAll(adminUserGroupEdit.updateAll, 2)" type="checkbox">
+                        </td>
+                        <td scope="col" style="text-align: center; width: 100px;">
+                            <input ng-model="adminUserGroupEdit.deleteAll" ng-click="adminUserGroupEdit.checkAll(adminUserGroupEdit.deleteAll, 1)" type="checkbox">
+                        </td>
+                        <td scope="col" style="text-align: center; width: 100px;">
+                            <input ng-model="adminUserGroupEdit.executeAll" ng-click="adminUserGroupEdit.checkAll(adminUserGroupEdit.executeAll, 0)" type="checkbox">
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr ng-repeat="group in adminUserGroupEdit.permissionGroups">
+                        <td data-Title="Permission" style="text-align: left">{{group.Title | i18next}}</td>
+                        <td data-Title="Read" style="text-align: center">
+                            <input bit-mask="1" ng-model="group.Perm[4]" ng-true-value="1" ng-false-value="0" ng-show="group.Read" ng-click="adminUserGroupEdit.validateCheck(group, 4)" type="checkbox">
+                        </td>
+                        <td data-Title="Create" style="text-align: center">
+                            <input bit-mask="1" ng-model="group.Perm[3]" ng-true-value="1" ng-false-value="0" ng-show="group.Create" ng-click="adminUserGroupEdit.validateCheck(group, 3)" type="checkbox">
+                        </td>
+                        <td data-Title="Update" style="text-align: center">
+                            <input bit-mask="1" ng-model="group.Perm[2]" ng-true-value="1" ng-false-value="0" ng-show="group.Update" ng-click="adminUserGroupEdit.validateCheck(group, 2)" type="checkbox">
+                        </td>
+                        <td data-Title="Delete" style="text-align: center">
+                            <input bit-mask="1" ng-model="group.Perm[1]" ng-true-value="1" ng-false-value="0" ng-show="group.Delete" ng-click="adminUserGroupEdit.validateCheck(group, 1)" type="checkbox">
+                        </td>
+                        <td data-Title="Execute" style="text-align: center">
+                            <input bit-mask="1" ng-model="group.Perm[0]" ng-true-value="1" ng-false-value="0" ng-show="group.Execute" ng-click="adminUserGroupEdit.validateCheck(group, 0)" type="checkbox">
+                        </td>
+                        <td></td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+        <div class="form-group col-sm-3">
+            <h4>Product Attribute Groups</h4>
+            <table class="table table-hover oc-table-responsive" style="text-align: center; margin: 0 auto;">
+                <thead>
+                    <tr>
+                        <th scope="col">
+                            Permission
+                        </th>
+
+                        <th scope="col" style="text-align: center">
+                            Edit
+                        </th>
+                        <th scope="col" style="text-align: center">
+
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: #efefef; padding: 10px 0;">
+                        <td scope="col" style="text-align: left; width: 200px;">
+                            <strong>Add to All</strong>
+                        </td>
+
+                        <td scope="col" style="text-align: center; width: 100px;">
+                            <input ng-model="adminUserGroupEdit.updateAllSpecs" ng-click="adminUserGroupEdit.checkAllSpec(adminUserGroupEdit.updateAllSpecs, 2)" type="checkbox">
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr ng-repeat="group in adminUserGroupEdit.specGroups">
+                        <td data-Title="Permission" style="text-align: left">{{group.Title}}</td>
+
+                        <td data-Title="Update" style="text-align: center">
+                            <input bit-mask="1" ng-model="group.Perm[2]" ng-true-value="1" ng-false-value="0" ng-show="group.Update" ng-click="adminUserGroupEdit.validateCheck(group, 2)" type="checkbox">
+                        </td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,33 @@
+<h3 class="page-header">
+    <b>Clone Product Group</b>
+</h3>
+<form name="productgroupsCloneForm" ng-submit="productgroupsClone.Submit(true)" novalidate>
+    <div class="row">
+        <div class="form-group edit-button-group">
+               <button type="button" class="btn btn-primary" ng-click="productgroupsClone.Submit(false)" ng-disabled="productgroupsCloneForm.$invalid">Save</button>
+            <button type="submit" class="btn btn-primary" ng-disabled="productgroupsCloneForm.$invalid">Save & Close</button>
+            <button type="button" class="btn btn-default" ui-sref="^">Cancel</button>
+        </div>
+    </div>
+     <em>* Required fields</em><br/><br/>
+    <div class="row">
+        <div class="form-group col-sm-6">
+            <label for="templateName">Template Name*</label>
+            <input id="templateName" type="text" class="form-control" ng-model="productgroupsClone.category.Name" ng-required="true"/>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="form-group col-sm-6">
+            <label for="categoryActiveInput">
+                <input id="categoryActiveInput" type="checkbox" ng-model="productgroupsClone.category.Active"/>
+                Active
+            </label>
+        </div>
+    </div>
+<!--<br /><br /><btn class="btn btn-primary" data-toggle="collapse" data-target="#rawData">Debug: Show Raw Data</btn>
+<div id="rawData" class="collapse">
+        <pre><code>{{productgroupsClone.category}}</code></pre>
+</div>-->
+</form>

@@ -1,0 +1,34 @@
+<h3 class="page-header">
+    <b>Edit Template:</b> {{categoryEdit.categoryName}}
+</h3>
+<form name="CategoryEditForm" ng-submit="DataJobEdit.Submit(true)" novalidate>
+    <div class="row">
+        <div class="form-group edit-button-group">
+            <button type="button" class="btn btn-primary" ng-click="DataJobEdit.Submit(false)" ng-disabled="CategoryEditForm.$invalid">Save</button>
+            <button type="submit" class="btn btn-primary" ng-disabled="CategoryEditForm.$invalid">Save & Close</button>
+            <button type="button" class="btn btn-default" ui-sref="^">Cancel</button>
+            <button type="button" class="btn btn-default" ng-click="DataJobEdit.Delete()"><i class="fa fa-trash text-danger"></i></button>
+        </div>
+    </div>
+    <em>* Required fields</em><br/><br/>
+    <div class="row">
+        <div class="form-group col-sm-6">
+            <label for="templateName">Type*</label><br>
+            <select class="form-control" ng-model="DataJobEdit.DataJob.xp['Type']" ng-required="true">
+                <option selected="true" value="Bulk Product Attribute Updates">Bulk Product Attribute Updates</option>
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-sm-6">
+            <label for="templateName">Title*</label><br>
+            <input id="templateName" type="text" class="form-control" ng-model="DataJobEdit.DataJob.Name" ng-required="true" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-sm-6">
+            <label for="templateDesc">Description*</label><br>
+            <textarea multiline="true" id="templateName" class="form-control" ng-model="DataJobEdit.DataJob.Description" ng-required="true" />
+        </div>
+    </div>
+</form>

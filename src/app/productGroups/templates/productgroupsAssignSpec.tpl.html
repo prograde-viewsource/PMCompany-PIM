@@ -1,0 +1,103 @@
+<h3 class="page-header">
+    <b>Assign Product Attributes to Product Group:</b> {{productgroupsAssignSpec.Category.Name}}
+</h3>
+<div class="row">
+    <div class="form-group edit-button-group">
+        <button type="button" class="btn btn-default" ng-click="productgroupsAssignSpec.doTheBack()"><i class="fa fa-arrow-left"></i> Back</button>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6 form-group">
+        <label for="productGroupFilter">Filter by Product Attribute Group:</label>
+
+        <select id="productGroupFilter" class="form-control" ng-model="productgroupsAssignSpec.groupFilter" ng-change="productgroupsAssignSpec.research()">
+            <option value="">Show All</option>
+            <option ng-repeat="option in productgroupsAssignSpec.SpecGroups" value="{{option}}">{{option}}</option>
+        </select>
+    </div>
+    <div class="col-md-6">
+        <label>Filter by Search:</label>
+        <div class="form-group">
+            <input type="search" class="form-control" placeholder="Search Product Attributes..." ng-model="productgroupsAssignSpec.searchFilter" ng-change="productgroupsAssignSpec.research()" />
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-6" ng-click="productgroupsAssignSpec.toggleListFilter()" ng-init="productgroupsAssignSpec.listFilter = true">
+        <div class="btn full-width" ng-class="productgroupsAssignSpec.listFilter ? 'btn-primary' : 'btn-default'">Apply filter to Product Attributes list <i class="fa" ng-class="productgroupsAssignSpec.listFilter ? 'fa-check-square-o' : 'fa-square-o'" /></div>
+    </div>
+    <div class="col-xs-6" ng-click="productgroupsAssignSpec.toggleAssignFilter()" ng-init="productgroupsAssignSpec.assignedFilter = true">
+        <div class="btn full-width" ng-class="productgroupsAssignSpec.assignedFilter ? 'btn-primary' : 'btn-default'">Apply filter to assigned Product Attributes <i class="fa" ng-class="productgroupsAssignSpec.assignedFilter ? 'fa-check-square-o' : 'fa-square-o'" /></div>
+    </div>
+    <br /> <br />
+</div>
+
+<div class="row">
+    <div class="col-xs-6">
+        <div class='scroll-count'>Showing <strong>{{productgroupsAssignSpec.list.Items.length}}</strong> of <strong>{{productgroupsAssignSpec.list.Meta.TotalCount - productgroupsAssignSpec.assignedSpecs.Items.length}}</strong></div>
+        <section class="table-fixed-header no-margin">
+
+            <div class="table-header-bg"></div>
+            <div class="table-container" servicename="Specs" ordercloud-infinite-scroll servicename="Specs" controlleras="productgroupsAssignSpec" idname="SpecID" disable-dynamic-validation ng-style="productgroupsAssignSpec.leftDragColMaxheight">
+                <table class="table table-hover">
+                    <colgroup>
+                        <col class="action-column" />
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>
+                                <div>
+                                    Name
+                                </div>
+                            </th>
+
+                        </tr>
+                    </thead>
+                    <tbody dragula="'spec-bag'" dragula-model="productgroupsAssignSpec.list.Items" class="oc-table-responsive">
+                        <tr ng-repeat="spec in  productgroupsAssignSpec.list.Items">
+                            <td class="text-center tool-td"><i id="handle" class="fa fa-arrows"></i> <i class="fa fa-caret-right" ng-click="productgroupsAssignSpec.pushOver(spec)"></i></td>
+                            <td data-title="Name"> &nbsp;{{spec.Name | slashify}}</td>
+                        </tr>
+                        <tr ng-if="!productgroupsAssignSpec.list.Items.length">
+                            <td class="alert alert-info" colspan="2">No matches found.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+    <div class="col-xs-6">
+
+        <div class='scroll-count'>Showing <strong>{{productgroupsAssignSpec.assignedSpecs.Items.length}}</strong> of <strong>{{productgroupsAssignSpec.assignedSpecs.Items.length}}</strong></div>
+        <section class="table-fixed-header no-margin">
+            <div class="table-header-bg"></div>
+            <div class="table-container" servicename="Specs" controlleras="productgroupsAssignSpec" idname="SpecID" disable-dynamic-validation ng-style="productgroupsAssignSpec.leftDragColMaxheight">
+                <table class="table table-hover">
+                    <colgroup>
+                        <col class="action-column" />
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>
+                                <div>
+                                    Name
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody dragula="'spec-bag'" dragula-model="productgroupsAssignSpec.assignedSpecs.Items" id="right-drag-col">
+                        <tr ng-repeat="spec in  productgroupsAssignSpec.assignedSpecs.Items">
+                            <td class="text-center tool-td"><i id="handle" class="fa fa-arrows"></i> <i class="fa fa-caret-left" ng-click="productgroupsAssignSpec.pushBack(spec)"></i></td>
+                            <td data-title="Name">{{spec.Name | slashify}}</td>
+                        </tr>
+                        <tr ng-if="!productgroupsAssignSpec.assignedSpecs.Items.length">
+                            <td class="alert alert-info" colspan="2">No matches found.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>

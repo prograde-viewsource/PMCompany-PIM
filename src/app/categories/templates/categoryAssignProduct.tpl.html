@@ -1,0 +1,141 @@
+<h3 class="page-header">
+    <b>Assign Products to Distribution Template:</b> {{categoryAssignProd.Category.Name}}
+</h3>
+
+<div class="row">
+    <div class="form-group edit-button-group">
+
+        <button type="button" class="btn btn-default" ui-sref="^"><i class="fa fa-arrow-left"></i> Back</button>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6 form-group">
+        <label for="productGroupFilter">Filter by Group:</label>
+        <select id="productGroupFilter" class="form-control" ng-model="categoryAssignProd.groupFilter" ng-change="categoryAssignProd.research()" ng-options="option.ID as option.Name group by option.Type for option in categoryAssignProd.productGroups">
+            <option value="">Show All</option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label>Filter by Search:</label>
+        <div class="form-group">
+            <input type="search" class="form-control" placeholder="Search Products..." ng-model="categoryAssignProd.searchFilter" ng-change="categoryAssignProd.research()" parse-slash />
+        </div>
+    </div>
+    <div class="col-md-2 form-group">
+
+        <div class="col-md-1" style="padding: 0px; margin-top:25px;">
+            <div style="position: relative; left: -13px; top: 6px;"><strong>by</strong></div>
+        </div>
+        <div class="col-md-11" style="padding: 0px; margin-top:25px;">
+            <select id="statusFilter" class="form-control" ng-model="categoryAssignProd.searchby" ng-change="categoryAssignProd.research()">
+                    <option ng-repeat="opt in categoryAssignProd.options.search_by" value="{{opt[0]}}">{{opt[1] | i18next}}</option>
+                </select>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 form-group">
+        <label for="statusFilter">{{'Filter by Status' | i18next}}:</label>
+        <select id="statusFilter" class="form-control" ng-model="categoryAssignProd.statusFilter" ng-change="categoryAssignProd.research()">
+           <option value="">{{'Show All' | i18next}}</option>
+           <option ng-repeat="opt in categoryAssignProd.options.product_status" value="{{opt[0]}}">{{opt[1] | i18next}}</option>
+        </select>
+    </div>
+    <div class="col-md-6 form-group">
+        <label>Filter by Brand:</label>
+        <select id="brandFilter" class="form-control" ng-model="categoryAssignProd.brandFilter" ng-change="categoryAssignProd.research()">
+           <option value="">{{'Show All' | i18next}}</option>
+           <option ng-repeat="opt in categoryAssignProd.options.brands " value="{{opt[0]}}">{{opt[1] | i18next}}</option>
+        </select>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-6" ng-click="categoryAssignProd.toggleListFilter()" ng-init="categoryAssignProd.listFilter = true">
+        <div class="btn full-width" ng-class="categoryAssignProd.listFilter ? 'btn-primary' : 'btn-default'">Apply filter to Product list <i class="fa" ng-class="categoryAssignProd.listFilter ? 'fa-check-square-o' : 'fa-square-o'" /></div>
+    </div>
+    <div class="col-xs-6" ng-click="categoryAssignProd.toggleAssignFilter()" ng-init="categoryAssignProd.assignedFilter = true">
+        <div class="btn full-width" ng-class="categoryAssignProd.assignedFilter ? 'btn-primary' : 'btn-default'">Apply filter to assigned Product list <i class="fa" ng-class="categoryAssignProd.assignedFilter ? 'fa-check-square-o' : 'fa-square-o'" /></div>
+    </div>
+    <br /> <br />
+</div>
+<div class="row">
+    <div class="col-xs-6">
+        <div class='scroll-count'>Showing <strong>{{categoryAssignProd.list.Items.length}}</strong> of <strong>{{ categoryAssignProd.list.Items.length > 0 ? categoryAssignProd.list.Meta.TotalCount : 0}}</strong></div>
+        <section class="table-fixed-header no-margin">
+            <div class="table-header-bg"></div>
+            <div class="table-container" ordercloud-infinite-scroll servicename="Products" pagingfunction="LeftPagingFunction" controlleras="categoryAssignProd" idname="ID" disable-dynamic-validation ng-style="categoryAssignProd.leftDragColMaxheight">
+                <table class="table table-hover">
+                    <colgroup>
+                        <col class="action-column" />
+                    </colgroup>
+                    <thead ng-if="categoryAssignProd.list.Items.length">
+                        <tr>
+                            <th class="tool-th">
+                                <div class="tool-div">
+                                    <span class="select-all" ng-click="categoryAssignProd.selectAll()">Assign All <i class="fa fa-caret-right"></i></span>
+                                </div>
+                            </th>
+                            <th>
+                                <div ng-click="categoryAssignProd.sortBy('ID')">Part Number<span class="sortorder" ng-show="categoryAssignProd.propertyName === 'ID'" ng-class="{reverse: categoryAssignProd.reverse}"></span></div>
+                            </th>
+                            <th>
+                                <div ng-click="categoryAssignProd.sortBy('Name')">Name <span class="sortorder" ng-show="categoryAssignProd.propertyName === 'Name'" ng-class="{reverse: categoryAssignProd.reverse}"></span></div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody dragula="'drag-bag'" dragula-model="categoryAssignProd.list.Items" class="oc-table-responsive">
+                        <tr ng-repeat="spec in  categoryAssignProd.list.Items  track by $index">
+                            <td class="text-center tool-td"><i id="handle" class="fa fa-arrows"></i> <i class="fa fa-caret-right" ng-click="categoryAssignProd.pushOver(spec)"></i></td>
+                            <td data-title="Id" class="part-number-td">{{spec.ID}}</td>
+                            <td data-title="Name">{{spec.Name}}</td>
+                        </tr>
+                        <tr ng-if="!categoryAssignProd.list.Items.length">
+                            <td class="alert alert-info" colspan="3" style="text-align: center">No matches found.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+    <div class="col-xs-6">
+        <div class='scroll-count'>Showing <strong>{{categoryAssignProd.prodAssignments.Items.length}}</strong> of <strong>{{categoryAssignProd.prodAssignments.Items.length > 0 ? categoryAssignProd.prodAssignments.Meta.TotalCount  : 0 }}</strong></div>
+        <section class="table-fixed-header no-margin">
+            <div class="table-header-bg"></div>
+            <div class="table-container" ordercloud-infinite-scroll servicename="products" pagingfunction="RightPagingFunction" controlleras="categoryAssignProd" idname="ID" disable-dynamic-validation ng-style="categoryAssignProd.leftDragColMaxheight">
+                <table class="table table-hover">
+                    <colgroup>
+                        <col class="action-column" />
+                    </colgroup>
+                    <thead ng-if="categoryAssignProd.prodAssignments.Items.length">
+                        <tr>
+                            <th class="tool-th">
+                                <div class="tool-div">
+                                    <span class="select-all" style="position: relative; left: -20px;" ng-click="categoryAssignProd.deselectAll()"><i class="fa fa-caret-left"></i> Unassign All</span>
+                                </div>
+                            </th>
+                            <th>
+                                <div ng-click="categoryAssignProd.sortBy('ID')">Part Number<span class="sortorder" ng-show="categoryAssignProd.propertyName === 'ID'" ng-class="{reverse: categoryAssignProd.reverse}"></span></div>
+                            </th>
+                            <th>
+                                <div ng-click="categoryAssignProd.sortBy('Name')">Name <span class="sortorder" ng-show="categoryAssignProd.propertyName === 'Name'" ng-class="{reverse: categoryAssignProd.reverse}"></span></div>
+                            </th>
+
+                        </tr>
+                    </thead>
+                    <tbody dragula="'drag-bag'" dragula-model="categoryAssignProd.prodAssignments.Items" id="right-drag-col">
+                        <tr ng-repeat="spec in  categoryAssignProd.prodAssignments.Items track by $index">
+                            <td class="text-center tool-td"><i id="handle" class="fa fa-arrows"></i> <i class="fa fa-caret-left" ng-click="categoryAssignProd.pushBack(spec)"></i></td>
+                            <td data-title="Id" class="part-number-td">{{spec.ID}}</td>
+                            <td data-title="Name">{{spec.Name}}</td>
+                        </tr>
+                        <tr ng-if="!categoryAssignProd.prodAssignments.Items.length">
+                            <td class="alert alert-info" colspan="3" style="text-align: center">No matches found.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>

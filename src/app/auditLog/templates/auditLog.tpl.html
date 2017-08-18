@@ -1,0 +1,42 @@
+<article id="COMPONENT_Audit" ui-view class="container-fluid">
+<h3 class="page-header">Audit Log</h3>
+<br/>
+<div class="row">
+    <div class="col-xs-2">
+        <label>Start Date</label>        
+        <div class="input-group">
+            <input type="search" class="form-control" placeholder="mm/dd/yy" ng-model="auditLog.searchStartDate">
+        </div>
+    </div>
+    <div class="col-xs-2">
+        <label>End Date</label>
+        <div class="input-group">
+            <input type="search" class="form-control" placeholder="mm/dd/yy" ng-model="auditLog.searchEndDate">
+        </div>
+    </div>
+    <div class="col-xs-2">
+        <label>Keyword</label>        
+        <div class="input-group">
+            <input type="search" class="form-control" placeholder="Keyword" ng-model="auditLog.searchKeyword">
+        </div>
+    </div>
+    <button type="button" class="btn btn-primary" ng-click="auditLog.searchAudits()">Search</button>
+</div>
+<br />
+<hr style="border-color:grey;">
+<br />
+<div class="row">
+    <div class="well well-lg">
+        <div style="overflow-x:auto;">
+            <table style="width:100%">
+                <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>User</th>
+                    <th>Action</th>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+</article>

@@ -1,0 +1,192 @@
+<h3 class="page-header">
+    <b>Edit Product Attribute</b>
+</h3>
+<form name="specEditForm" ng-submit="specEdit.Submit(null, true)" novalidate>
+    <div class="row">
+        <div class="form-group edit-button-group">
+            <button type="button" class="btn btn-primary" ng-click="specEdit.Submit(null, false)" user-permissions pbit="4" pobj="specs" ng-disabled="specEditForm.$invalid">Save</button>
+
+            <button type="submit" class="btn btn-primary" user-permissions pbit="4" pobj="specs" ng-disabled="specEditForm.$invalid">Save & Close</button>
+
+            <button type="button" class="btn btn-default" ui-sref="^">Cancel</button>
+            <button type="button" class="btn btn-default" user-permissions pbit="8" pobj="specs" ng-click="specEdit.Delete()"><i class="fa fa-trash text-danger"></i></button>
+        </div>
+    </div>
+    <em>* Required fields</em><br/><br/>
+    <div class="row">
+        <div class="form-group col-sm-6">
+            <label for="specNameInput">Product Attribute Name*</label>
+            <input id="specNameInput" type="text" class="form-control" ng-model="specEdit.spec.Name" ng-required="true" />
+
+        </div>
+        <div class="col-sm-6 form-group">
+            <label for="specDefaultInput">Default Value</label>
+            <input id="specDefaultInput" type="text" class="form-control" ng-model="specEdit.spec.DefaultValue" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-sm-6">
+            <label for="specGroup">Product Attribute Group</label>
+            <select id="specGroup" class="form-control" ng-model="specEdit.spec.xp.Group" ng-options="g as g for g in specEdit.specGroupOptions"></select>
+        </div>
+        <div class="form-group col-sm-6">
+            <label for="specDefaultInput">Description</label>
+            <textArea id="specDefaultInput" type="text" class="form-control" ng-model="specEdit.spec.xp.Description" />
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-sm-12">
+            <label for="specRequiredInput">
+                <input id="specRequiredInput" type="checkbox" ng-model="specEdit.spec.Required"/>
+                Required
+            </label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-sm-6" ng-if="specEdit.AssetManager">
+            <label for="specGroup">
+				<input id="specRequiredInput" type="checkbox" ng-model="specEdit.spec.xp.isMediaAttribute"></input>
+				Media Attribute
+            </label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <h4>
+                        <b>Add Custom {{'Channel' | i18next}} Labels</b>
+                    </h4>
+                    <div class="row">
+                        <div class="col-sm-6 form-group">
+                            <label for="specChannelInput">{{'Channel' | i18next}}</label>
+                            <select id="specChannelInput" class="form-control" ng-model="specEdit.Buyer" ng-options="b.Name for b in specEdit.buyers.Items | filter: { Name: '!Order Agent'} | orderBy: 'Name'">
+                        <option value=""></option>
+                    </select>
+                        </div>
+                        <div class="col-sm-6 form-group">
+                            <label for="specLabelInput">Label</label>
+                            <input id="specLabelInput" type="text" class="form-control" ng-model="specEdit.BuyerLabel" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-2 form-group">
+                            <button type="button" user-permissions pbit="4" pobj="specs" ng-if="!specEdit.overwrite" class="btn btn-primary" ng-click="specEdit.addBuyerLabel()" ng-disabled="!specEdit.BuyerLabel || !specEdit.Buyer">Add Custom {{'Channel' | i18next}} Label</button>
+                            <button type="button" user-permissions pbit="4" pobj="specs" ng-if="specEdit.overwrite" class="btn btn-primary" ng-click="specEdit.updateBuyerLabel()" ng-disabled="!specEdit.BuyerLabel || !specEdit.Buyer">Update Custom {{'Channel' | i18next}} Label</button>
+                        </div>
+                    </div>
+                    <table class="table table-hover oc-table-responsive form-group" ng-show="specEdit.spec.xp.CustomLabels">
+                        <thead>
+                            <tr>
+                                <th scope="col">
+                                    <a href="#" role="button" ng-click="specs.updateSort('ID')">
+                                        <i class="fa fa-caret-down" ng-show="specs.parameters.sortBy == 'ID'"></i>
+                                        <i class="fa fa-caret-up" ng-show="specs.parameters.sortBy == '!ID'"></i>
+                                    </a>
+                                </th>
+                                <th scope="col">
+                                    <a href="#" role="button" ng-click="specs.updateSort('ID')">
+                            Buyer
+                            <i class="fa fa-caret-down" ng-show="specs.parameters.sortBy == 'ID'"></i>
+                            <i class="fa fa-caret-up" ng-show="specs.parameters.sortBy == '!ID'"></i>
+                        </a>
+                                </th>
+                                <th scope="col">
+                                    <a href="#" role="button" ng-click="specs.updateSort('Name')">
+                            Label
+                            <i class="fa fa-caret-down" ng-show="specs.parameters.sortBy == 'Name'"></i>
+                            <i class="fa fa-caret-up" ng-show="specs.parameters.sortBy == '!Name'"></i>
+                        </a>
+                                </th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="(buyer, obj) in specEdit.spec.xp.CustomLabels">
+                                <td>
+                                    <a class="fa fa-trash text-danger" ng-click="specEdit.deleteBuyerLabel(obj.ID)"></a>
+                                </td>
+                                <th scope="row">{{obj.Name}}</th>
+                                <td data-title="Name" ng-hide="canEdit">{{obj.Label}}</td>
+                                <td data-title="Name" ng-show="canEdit"><input class="form-control" ng-model="updateLabel"></td>
+                                <td class="actions-cell">
+                                    <a class="btn btn-default btn-sm" ng-hide="canEdit" ng-click="specEdit.setCustomLabelEdit(this)">Edit</a>
+                                    <a class="btn btn-default btn-sm" ng-show="canEdit" ng-click="specEdit.updateCustomLabel(this)">Save</a>
+                                    <a class="btn btn-default btn-sm" ng-show="canEdit" ng-click="specEdit.cancelCustomLabelEdit(this)">Cancel</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class=" col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-body" ng-class="{ 'fade50': specEdit.spec.xp.isMediaAttribute, 'fade100': !specEdit.spec.xp.isMediaAttribute }">
+                    <h4>
+                        <b>Add Product Attribute Options</b>
+                    </h4>
+                    <div class="row">
+                        <div class="col-sm-6 form-group">
+                            <label for="specValueInput">Value</label>
+                            <input id="specValueInput" type="text" ng-disabled="specEdit.spec.xp.isMediaAttribute" class="form-control" ng-model="specEdit.Option.Value" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-sm-6">
+                            <label for="specOptDefaultInput">
+                        <input id="specOptDefaultInput" type="checkbox" ng-model="specEdit.DefaultOptionID"/>
+                        Set as default Product Attribute Option
+                    </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-2 form-group">
+                            <button type="button" ng-if="!specEdit.overwrite" user-permissions pbit="4" pobj="specs" class="btn btn-primary" ng-click="specEdit.addSpecOpt()" ng-disabled="!specEdit.Option.Value">Add Product Attribute Option</button>
+                            <button type="button" ng-if="specEdit.overwrite" user-permissions pbit="4" pobj="specs" class="btn btn-primary" ng-click="specEdit.updateSpecOpt()" ng-disabled="!specEdit.Option.Value">Update Product Attribute Option</button>
+                        </div>
+                    </div>
+                    <div class="table-container" ordercloud-infinite-scroll servicename="Specs" controlleras="specEdit">
+                        <table class="table table-hover form-group">
+                            <colgroup>
+                                <col class="action-column" />
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>
+                                    </th>
+                                    <th>
+                                        <div ng-click="specEdit.sortOptions()"> <a href="#" role="button">Value</a></div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="specOpts in specEdit.Options | orderBy: 'Value':specEdit._sortOptions  track by $index">
+                                    <td class="text-center">
+                                        <a class="fa fa-trash text-danger" ng-click="specEdit.deleteSpecOpt($index)"></a>
+                                    </td>
+                                    <td ng-hide="canEdit">{{specOpts.Value}}</td>
+                                    <td ng-show="canEdit"><input class="form-control" ng-model="updateLabel"></td>
+                                    <td class="actions-cell">
+                                        <a class="btn btn-default btn-sm" ng-hide="canEdit" ng-click="specEdit.setSpecOptEdit(this)">Edit</a>
+                                        <a class="btn btn-default btn-sm" ng-show="canEdit" ng-click="specEdit.updateSpecOpt(this)">Save</a>
+                                        <a class="btn btn-default btn-sm" ng-show="canEdit" ng-click="specEdit.cancelSpecOptEdit(this)">Cancel</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row" ng-show="specEdit.Options.length > 0">
+                        <div class="form-group col-sm-6">
+                            <label for="specOptMultiSelect">
+							<input id="specOptMultiSelect" type="checkbox" ng-model="specEdit.spec.xp.Multiselect" disabled />
+							Allow multi-select
+                    	</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

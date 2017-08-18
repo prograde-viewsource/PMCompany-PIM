@@ -1,0 +1,142 @@
+<article id="COMPONENT_Specs" ui-view class="container-fluid">
+    <div class="page-header">
+        <h3>Product Attributes</h3>
+    </div>
+    <!--====== SEARCH/FILTERS ======-->
+    <div class="row">
+        <div class="form-group edit-button-group">
+            <button user-permissions pbit="16" pobj="templates" ng-click="categoryAssignSpec.runTemplate()" class="btn btn-success btn-sm">Run Sample Template</button>
+            <button type="button" class="btn btn-default" ui-sref-opts="{reload:true}" style="padding: 4px 12px;" ui-sref="^"><i class="fa fa-arrow-left"></i> Back</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 form-group">
+            <label for="groupFilterSelect">Filter by Group:</label>
+            <select id="groupFilterSelect" class="form-control" ng-change="categoryAssignSpec.research()" ng-options="group for group in categoryAssignSpec.specGroups" ng-model="categoryAssignSpec.groupFilter">
+                <option value="">Show All</option>
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label>Filter by Search:</label>
+            <div class="form-group">
+                <input type="search" class="form-control" placeholder="Search Product Attributes..." ng-model="categoryAssignSpec.searchInput" ng-change="categoryAssignSpec.research()" />
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-xs-6" ng-click="categoryAssignSpec.toggleListFilter()" ng-init="categoryAssignSpec.listFilter = true">
+            <div class="btn full-width" ng-class="categoryAssignSpec.listFilter ? 'btn-primary' : 'btn-default'">Apply filter to Product Attribute list <i class="fa" ng-class="categoryAssignSpec.listFilter ? 'fa-check-square-o' : 'fa-square-o'" /></div>
+        </div>
+        <div class="col-xs-6" ng-click="categoryAssignSpec.toggleAssignFilter()" ng-init="categoryAssignSpec.assignedFilter = true">
+            <div class="btn full-width" ng-class="categoryAssignSpec.assignedFilter ? 'btn-primary' : 'btn-default'">Apply filter to assigned Product Attributes <i class="fa" ng-class="categoryAssignSpec.assignedFilter ? 'fa-check-square-o' : 'fa-square-o'" /></div>
+        </div>
+        <br/><br/>
+    </div>
+
+    <!--====== LIST ======-->
+    <div class="row">
+        <div class="col-xs-6">
+            <div class='scroll-count'>Showing <strong>{{filter.length}}</strong> of <strong>{{categoryAssignSpec.list.Items.length}}</strong></div>
+
+            <section class="table-fixed-header no-margin">
+                <div class="table-header-bg"></div>
+                <div class="table-container" servicename="Specs" ordercloud-infinite-scroll controlleras="categoryAssignSpec" idname="SpecID" disable-dynamic-validation ng-style="categoryAssignSpec.leftDragColMaxheight">
+                    <table class="table table-hover">
+                        <colgroup>
+                            <col class="action-column" />
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th class="tool-th">
+                                    <div class="tool-div" style="left: 15px;">
+                                        <span class="select-all" ng-click="categoryAssignSpec.selectAll()">Assign All <i class="fa fa-caret-right"></i></span>
+                                    </div>
+                                </th>
+                                <th>
+                                    <div>
+                                        Product Attributes
+                                    </div>
+                                </th>
+                                <th>
+                                    <div>
+                                        {{'Channel' | i18next}} Label
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody dragula="'spec-bag'" dragula-model="categoryAssignSpec.list.Items" class="oc-table-responsive">
+                            <tr ng-repeat="spec in categoryAssignSpec.list.Items | filter: ( categoryAssignSpec.listFilter ? {xp: {'Group':categoryAssignSpec.groupFilter}} : undefined):true | filter: ( categoryAssignSpec.listFilter ? categoryAssignSpec.searchFilter : undefined) | orderBy:'Name' as filter">
+                                <td class="text-center tool-td"><i id="handle" class="fa fa-arrows"></i> <i class="fa fa-caret-right" ng-click="categoryAssignSpec.pushOver(spec.ID)"></i></td>
+                                <td>
+                                    {{spec.Name | slashify}}</td>
+                                <td class="label-td">
+                                    {{spec.xp.CustomLabels[categoryAssignSpec.buyer.ID].Label}}
+                                </td>
+                            </tr>
+                            <tr ng-if="!categoryAssignSpec.list.Items.length">
+                                <td class="alert alert-info" style="text-align: center;" colspan="3">No matches found.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- End height limited left dragula column -->
+
+
+        </div>
+        <div class="col-xs-6">
+            <div class='scroll-count'>Showing <strong>{{filtered.length}}</strong> of <strong>{{categoryAssignSpec.assignments.Items.length}}</strong></div>
+
+            <section class="table-fixed-header no-margin">
+                <div class="table-header-bg"></div>
+                <div class="table-container" servicename="Specs" controlleras="categoryAssignSpec" idname="SpecID" disable-dynamic-validation ng-style="categoryAssignSpec.leftDragColMaxheight">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+
+                                <th class="tool-th" colspan="2">
+                                    <div class="tool-div" style="left: 4px; max-width: 10px;">
+                                        <span class="select-all" ng-click="categoryAssignSpec.deselectAll()"><i class="fa fa-caret-left"></i> Unassign All</span>
+                                    </div>
+                                </th>
+
+                                <th>
+                                    <div>
+                                        Product Attributes
+                                    </div>
+                                </th>
+                                <th>
+                                    <div>
+                                        {{'Channel' | i18next}} Label
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody dragula="'spec-bag'" dragula-model="categoryAssignSpec.assignments.Items" id="right-drag-col">
+                            <tr ng-repeat="spec in categoryAssignSpec.assignments.Items | filter: ( categoryAssignSpec.assignedFilter  ? {xp: {'Group':categoryAssignSpec.groupFilter}} : undefined):true  | filter: ( categoryAssignSpec.assignedFilter ? categoryAssignSpec.searchFilter : undefined) as filtered  track by $index"
+                                ng-init="editMode = false">
+
+                                <td class="text-center tool-td"><i id="handle" class="fa fa-arrows"></i> <i class="fa fa-caret-left" ng-click="categoryAssignSpec.pushBack(spec.ID)"></i></td>
+                                <td class="text-center" style="color: #9e9a9a; width: 50px; font-size: 11px; "> {{ categoryAssignSpec.colLetter($index) }} </td>
+                                <td> {{spec.Name | slashify}}</td>
+                                <td class="label-td">
+                                    <input type="text" ng-show="spec.editMode" class="form-control" placeholder="" ng-show="spec.xp.CustomLabels" ng-model="spec.xp.CustomLabels[categoryAssignSpec.buyer.ID].Label" style="display: inline-block; width: 80%; height: 23px;" />
+                                    <span ng-show="!spec.editMode">{{spec.xp.CustomLabels[categoryAssignSpec.buyer.ID].Label}}</span>
+                                    <i class="fa fa-plus" ng-show="!spec.xp.CustomLabels[categoryAssignSpec.buyer.ID]" ng-click="categoryAssignSpec.addCustomLabel(spec)" style="float:right; color: #22557a; padding: 0px 5px"></i>
+                                    <i class="fa fa-trash" ng-show="spec.xp.CustomLabels[categoryAssignSpec.buyer.ID] && spec.editMode" ng-click="categoryAssignSpec.removeCustomLabel(spec)" style="float:right; color: red; padding: 5px 5px"></i>
+                                    <i class="fa fa-pencil" ng-show="spec.xp.CustomLabels[categoryAssignSpec.buyer.ID] && !spec.editMode" ng-click="spec.editMode = !spec.editMode" style="float:right;color: #22557a; padding: 5px 5px"></i>
+                                    <i class="fa fa-save" ng-show="spec.xp.CustomLabels[categoryAssignSpec.buyer.ID] && spec.editMode" ng-click="categoryAssignSpec.UpdateSpec(spec)" style="float:right;color: #22557a; padding: 5px 5px"></i>
+                                </td>
+                            </tr>
+                            <tr ng-if="categoryAssignSpec.assignments.Items.length == 0">
+                                <td colspan="3" style="text-align: center;" class="alert alert-info">No matches found. Drag and arrange Product Attributes here.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+        </div>
+    </div>
+    </div>
+</article>

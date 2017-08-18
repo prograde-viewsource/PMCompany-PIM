@@ -1,0 +1,73 @@
+<h3 class="page-header">
+    <b>New User</b> 
+</h3>
+<form name="AdminUserCreateForm" ng-submit="adminUserCreate.Submit()" novalidate>
+    <div class="row">
+        <div class="form-group edit-button-group">
+            <button type="submit" class="btn btn-primary" ng-disabled="AdminUserCreateForm.$invalid">Save & Close</button>
+            <button type="button" class="btn btn-default" ui-sref="^">Cancel</button>
+            <button type="button" class="btn btn-default" ng-click="adminUserCreate.Delete()"><i class="fa fa-trash text-danger"></i></button>
+        </div>
+    </div>
+     <em>* Required fields</em><br/><br/>
+      <div class="col-sm-6 form-group">
+            <label for="userNameInput">User Name*</label>
+            <input id="userNameInput" type="text"  class="form-control" ng-model="adminUserCreate.adminUser.Username" ng-required="true"/>
+      <br/>
+            <label for="userFirstNameInput">First Name*</label>
+             <input id="userFirstNameInput" type="text" class="form-control" ng-model="adminUserCreate.adminUser.FirstName" ng-required="true"/>
+         <br/>
+            <label for="userLastNameInput">Last Name*</label>
+            <input id="userLastNameInput" type="text" class="form-control" ng-model="adminUserCreate.adminUser.LastName" ng-required="true"/>
+          <br/>
+            <label for="userEmailAddressInput">Email Address*</label>
+            <input id="userEmailAddressInput" type="email" class="form-control" ng-model="adminUserCreate.adminUser.Email" ng-required="true"/>
+            <br/>
+         <div class="col-sm-6 form-group" style="padding: 0px;padding-right: 5px">
+            <label for="userPasswordInput">Password*</label>
+            <input id="userPasswordInput" type="password" pattern='^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$' pattern-err-type="customPassword" class="form-control" ng-model="adminUserCreate.adminUser.Password"  ng-required="true"/>
+       </div>
+         <div class="col-sm-6 form-group" style="padding: 0px; padding-left: 5px">
+            <label for="userPasswordConfirmInput">Confirm Password*</label>
+            <input id="userPasswordConfirmInput" type="password" pattern='^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$' pattern-err-type="customPassword" class="form-control" ng-model="adminUserCreate.PasswordConfirm"  ng-required="true"/>
+            </div>
+ <br/>
+        <label for="userActiveCheckbox">
+            <input id="userActiveCheckbox" type="checkbox" ng-model="adminUserCreate.adminUser.Active"/>
+            Active</label>
+        </div>
+        <div class="col-sm-6 form-group" >
+        <label for="securityProfile">User Group</label>
+        <br>
+
+ <table class="table table-hover">
+            <colgroup>
+                <col class="action-column"/>
+            </colgroup>
+            <thead>
+           
+            </thead>
+            <tbody>
+            <tr ng-repeat="adminUser in adminUserCreate.securityProfilesAvailable track by $index">
+                <td class="text-center" style="width:60px">
+                    <input name="adminUserCreate.adminUserGroup_assign[]" value="adminUser.ID"  type="checkbox" ng-model="adminUser.selected">
+                </td>
+                <td>
+                    {{adminUser.Name}}
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+    </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6 form-group">
+                 </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6 form-group">
+           
+        </div>
+    </div>
+</form>

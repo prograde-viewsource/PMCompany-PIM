@@ -1,0 +1,111 @@
+<h3 class="page-header">
+    <b>Run Ad Hoc Distribution Template:</b> {{categoryAdHoc.Category.Name}}
+</h3>
+<div class="row">
+    <div class="form-group edit-button-group">
+        <button type="button" class="btn btn-default" ui-sref="^"><i class="fa fa-arrow-left"></i> Back</button>
+        <button type="button" class="btn btn-primary" ng-click="categoryAdHoc.openModal()">Paste Product ID List</button>
+        <button type="button" class="btn btn-success" user-permissions pbit="16" pobj="templates" ng-click="categoryAdHoc.runTemplate()">Run Template</button>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6 form-group">
+        <label for="productGroupFilter">Filter by Group:</label>
+        <select id="productGroupFilter" class="form-control" ng-model="categoryAdHoc.groupFilter" ng-change="categoryAdHoc.research()">
+            <option value="">Show All</option>
+            <option ng-repeat="option in categoryAdHoc.productGroupOptions" value="{{option.ID}}">{{option.Name}}</option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label>Filter by Search:</label>
+        <div class="form-group">
+            <input type="search" class="form-control" placeholder="Search Products..." ng-model="categoryAdHoc.searchFilter" ng-change="categoryAdHoc.research()" parse-slash />
+        </div>
+    </div>
+             <div class="col-md-2 form-group">
+             
+            <div class="col-md-1" style="padding: 0px; margin-top:25px;">
+                <div style="position: relative; left: -13px; top: 6px;"><strong>by</strong></div>
+                </div>
+            <div class="col-md-11" style="padding: 0px; margin-top:25px;">
+                <select id="statusFilter" class="form-control"  ng-model="categoryAdHoc.searchby" ng-change="categoryAdHoc.research()">
+                    <option ng-repeat="opt in categoryAdHoc.options.search_by" value="{{opt[0]}}">{{opt[1] | i18next}}</option>
+                </select>
+            </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 form-group">
+        <label for="statusFilter">{{'Filter by Status' | i18next}}:</label>
+        <select id="statusFilter" class="form-control" ng-model="categoryAdHoc.statusFilter" ng-change="categoryAdHoc.research()">
+             <option value="">{{'Show All' | i18next}}</option>
+           <option ng-repeat="opt in categoryAdHoc.options.product_status" value="{{opt[0]}}">{{opt[1] | i18next}}</option>
+        </select>
+    </div>
+    <div class="col-md-6 form-group">
+        <label>Filter by Brand:</label>
+        <select id="brandFilter" class="form-control" ng-model="categoryAdHoc.brandFilter" ng-change="categoryAdHoc.research()">
+             <option value="">{{'Show All' | i18next}}</option>
+           <option ng-repeat="opt in categoryAdHoc.options.brands" value="{{opt[0]}}">{{opt[1] | i18next}}</option>
+        </select>
+    </div>
+</div>
+
+<div class="well well-lg text-center" ng-if="!categoryAdHoc.list.Items.length">
+    <b>No products found. Make sure products are assigned to this channel.</b>
+</div>
+<section class="table-fixed-header" ng-if="categoryAdHoc.list.Items.length">
+    <div class="table-header-bg"></div>
+    <div class="table-container" ordercloud-infinite-scroll servicename="Products" controlleras="categoryAdHoc" idname="ProductID" disable-dynamic-validation>
+        <table class="table table-hover">
+            <colgroup>
+                <col class="action-column" />
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>
+                        <div ng-click="categoryAdHoc.sortBy('ID')">ID <span class="sortorder" ng-show="categoryAdHoc.propertyName === 'ID'" ng-class="{reverse: categoryAdHoc.reverse}"></span></div>
+                    </th>
+                    <th>
+                        <div ng-click="categoryAdHoc.sortBy('Name')">Name <span class="sortorder" ng-show="categoryAdHoc.propertyName === 'Name'" ng-class="{reverse: categoryAdHoc.reverse}"></span></div>
+                    </th>
+                    <th>
+                        <div class="input-group">
+                            <label>Selected <span class="sortorder" ng-show="categoryAdHoc.propertyName === 'selected'" ng-class="{reverse: categoryAdHoc.reverse}"></span><input type="checkbox" ng-change="categoryAdHoc.toggleSelectAll()" ng-model="categoryAdHoc.selectAll" /></label>
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="product in categoryAdHoc.list.Items | filter:categoryAdHoc.groupFilter | orderBy:categoryAdHoc.propertyName:categoryAdHoc.reverse track by $index">
+                    <td>{{product.ID | slashify}}</td>
+                    <td>{{product.Name | slashify}}</td>
+                    <td class="text-center">
+                        <input name="{{'product_assign_' + $index}}" type="checkbox" ng-model="product.selected" ng-change="categoryAdHoc.toggleCheck(product)">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<script type="text/ng-template" id="copyPasteModal.html">
+    <div class="modal-header">
+        Copy and Paste to Assign
+    </div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12 form-group">
+                <textarea class="form-control" placeholder="Paste ID list from spreadsheet..." ng-model="copyPasteModal.source" ng-change="copyPasteModal.parseText()"></textarea>
+            </div>
+            <div class="col-md-6 form-group" ng-repeat="product in copyPasteModal.list">
+                <input class="form-control" type="text" value="{{product}}" disabled />
+            </div>
+        </div>
+    </div>
+    <div class="category-modal-footer modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="copyPasteModal.update()" ng-disabled="copyPasteModal.inProgress">Update Product Assignments</button>
+        <button class="btn btn-default" type="button" ng-click="copyPasteModal.cancel()" ng-disabled="copyPasteModal.inProgress">Close</button>
+    </div>
+</script>

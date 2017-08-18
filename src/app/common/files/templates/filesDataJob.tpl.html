@@ -1,0 +1,13 @@
+<div class="form-group" ng-class="{'has-error': invalidExtension}">
+    <figure ng-if="model['Excel Template'].File && model['Excel Template'].Type.indexOf('image') > -1">
+        <img class="img-responsive" ng-src="{{model['Excel Template'].File}}" alt="">
+    </figure>
+    <label>{{label}}</label>
+    <p>
+        <button type="button" ng-show="model['Excel Template'].File" class="btn btn-default" ng-click="downloadTemplate()">Download</button>
+        <button type="button" class="btn btn-default" ng-click="upload()" ng-show=" !model['Results']" >{{model['Excel Template'].File ? 'Replace' : 'Upload'}}</button>
+        <button type="button" class="btn btn-default" ng-click="remove()" ng-show=" !model['Results']" ng-if="model.File"><i class="fa fa-trash text-danger"></i></button>
+    </p>
+    <input class="ng-hide"  multiple="multiple" name="upload" type="file" id="orderCloudUpload{{indexid}}" />
+    <span class="help-block error-msg" ng-show="invalidExtension">Invalid File Type</span>
+</div>

@@ -1,0 +1,106 @@
+<h3 class="page-header">
+    <b>Clone Product:</b> {{productClone.productName}}
+</h3>
+<form name="EditForm" ng-submit="productClone.Submit(true)" novalidate>
+    <div class="row">
+        <div class="form-group edit-button-group">
+            <button type="button" class="btn btn-primary" ng-click="EditForm.$valid && productClone.Submit(false)" user-permissions pbit="4" pobj="products" ng-disabled="EditForm.$invalid">{{'Save' | i18next}}</button>
+            <button type="submit" class="btn btn-primary" user-permissions pbit="4" pobj="products" ng-disabled="EditForm.$invalid">{{'Save & Close' | i18next}}</button>
+            <button type="button" class="btn btn-default" ui-sref="^">{{'Cancel' | i18next}}</button>
+        </div>
+    </div>
+    <em>* Required fields</em><br/><br/>
+    <div class="row">
+        <div class="form-group col-sm-6">
+            <label for="productIDInput">{{'Product Number' | i18next}}*</label>
+            <input id="productIDInput" type="text" class="form-control" user-permissions pbit="4" pobj="Basic Attributes" pattern="([A-Za-z0-9-_\/]+)" pattern-err-type="ID_Name" ng-model="productClone.product.ID" ng-required="true" parse-slash />
+        </div>
+        <div class="col-sm-6 form-group">
+            <label for="productSAPDescriptionInput">{{'ERP Description' | i18next}}</label>
+            <input id="productSAPDescriptionInput" type="text" ng-if="!productCreate.erp_as_product_name" user-permissions pbit="4" pobj="Basic Attributes" class="form-control" ng-model="productClone.product.xp['SAP-Description']"></input>
+            <input id="productSAPDescriptionInput" type="text" ng-if="productCreate.erp_as_product_name" user-permissions pbit="4" pobj="Basic Attributes" class="form-control" ng-model="productClone.product.Name"></input>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 form-group">
+            <label for="productDescriptionInput">{{'Long Description' | i18next}}</label>
+            <textarea id="productDescriptionInput" type="text" user-permissions pbit="4" pobj="Basic Attributes" class="form-control" style="min-height: 125px;" ng-model="productClone.product.Description"></textarea>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 form-group">
+
+            <label ng-if="!productCreate.erp_as_product_name" for="productNameInput">{{'Short Description' | i18next}}*</label>
+            <input ng-if="!productCreate.erp_as_product_name" id="productNameInput" type="text" class="form-control" user-permissions pbit="4" pobj="Basic Attributes" ng-model="productClone.product.Name" ng-required="true" parse-slash />
+
+            <label ng-if="productCreate.erp_as_product_name" for="productNameInput">{{'Short Description' | i18next}}</label>
+            <input ng-if="productCreate.erp_as_product_name" id="productNameInput" type="text" class="form-control" user-permissions pbit="4" pobj="Basic Attributes" ng-model="productClone.product.xp['Short-Description']" ng-required="false" parse-slash />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 form-group">
+            <label for="productStatusInput">{{'Status' | i18next}}*</label>
+            <select id="productStatusInput" class="form-control" user-permissions pbit="4" pobj="Basic Attributes" ng-model="productClone.product.xp.Status" ng-required="true">
+                 <option ng-repeat="opt in productClone.options.product_status" value="{{opt[0]}}">{{opt[1] | i18next}}</option>
+            </select>
+        </div>
+        <div class="col-md-6 form-group">
+            <label for="productBrandInput">{{'Brand Name' | i18next}}</label>
+            <input id="productBrandInput" type="text" class="form-control" user-permissions pbit="4" pobj="Basic Attributes" ng-model="productClone.product.xp['Brand-Name']" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 form-group">
+            <label for="productUPCInput">{{'UPC' | i18next}}</label>
+            <input id="productUPCInput" type="text" class="form-control" user-permissions pbit="4" pobj="Basic Attributes" ng-model="productClone.product.xp['UPC-Each']" />
+        </div>
+        <div class="col-md-6 form-group">
+            <label for="productGroupInput">{{'Product Group' | i18next}}</label>
+            <div class="row">
+                <div class="col-xs-12 col-sm-7">
+                    <select id="productGroupInput" class="form-control" user-permissions pbit="4" pobj="Basic Attributes" ng-model="productClone.product.xp['Product-Group']" ng-required="false" ng-options="option.ID as option.Name for option in productClone.productGroupOptions"
+                    />
+                </div>
+                <div class="col-xs-12 col-sm-5">
+                    <a class="btn btn-default form-control" ng-click="productClone.applyGroup()" user-permissions pbit="4" pobj="products">{{'Apply Group' | i18next}}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 form-group">
+            <uib-accordion close-others="true">
+
+                <div uib-accordion-group class="panel-default" template-url="products/templates/groupHeaderTemplate.tpl.html" heading="{{group.Name}}" ng-repeat="group in productClone.specGroups |  orderBy:productClone.CustomListOrder">
+                    <div ng-repeat="spec in group.Specs | orderBy: '-Name'">
+                        <div class="form-group col-sm-10">
+                            <label ng-if="spec.OptionCount == 0 || (spec.OptionCount > 0 && !spec.xp.Multiselect)">{{spec.Name}}<span ng-show="spec.Required">*</span></label>
+                            <input type="text" class="form-control" user-permissions pbit="4" pobj="{{group.Name}}" ng-model="spec.Assignment.DefaultValue" ng-if="spec.OptionCount == 0" />
+                            <select type="text" class="form-control" user-permissions pbit="4" pobj="{{group.Name}}" ng-options="option.ID as option.Value for option in spec.xp.Options | orderBy: 'Value'" ng-model="spec.Assignment.DefaultOptionID" ng-if="spec.OptionCount > 0 && !spec.xp.Multiselect"></select>
+                            <uib-accordion close-others="false" ng-if="spec.OptionCount > 0 && spec.xp.Multiselect">
+                                <br />
+                                <div uib-accordion-group class="panel-default" heading="{{spec.Name}}">
+                                    <table class="table table-hover" style="width:auto !important;">
+                                        <tbody class="no-matches">
+                                            <tr ng-repeat="option in spec.xp.Options track by $index" class="form-group">
+                                                <td style="vertical-align:middle !important; padding:5px !important;">{{option.Value}}</td>
+                                                <td style="vertical-align:middle !important; padding:5px !important;">
+                                                    <input name="{{'option_' + $index}}" user-permissions pbit="4" pobj="{{group.Name}}" type="checkbox" class="form-control" ng-change="productClone.updateMultiSelect(spec)" ng-model="productClone.multiSelects[spec.ID][option.ID]">
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                        </div>
+                        </uib-accordion>
+                    </div>
+                </div>
+            </uib-accordion>
+        </div>
+    </div>
+    <div class="alert alert-warning" ng-show="productClone.missingSpecs.length"><i class="fa fa-warning" /> {{'This product is missing the following attribute values' | i18next}} <br>
+        <ul ng-repeat="spec in productClone.missingSpecs">
+            <li>{{spec}}</li>
+        </ul>
+    </div>
+</form>

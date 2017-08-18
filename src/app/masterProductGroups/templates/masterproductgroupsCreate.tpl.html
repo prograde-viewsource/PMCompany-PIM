@@ -1,0 +1,80 @@
+<h3 class="page-header">
+    <b>New Master Product Group</b>
+</h3>
+<form name="masterproductgroupsCreateForm" ng-submit="masterproductgroupsCreate.Submit(true)" novalidate>
+    <div class="row">
+        <div class="form-group edit-button-group">
+            <button type="button" class="btn btn-primary" ng-click="masterproductgroupsCreate.Submit(false)" ng-disabled="masterproductgroupsCreateForm.$invalid">Save</button>
+            <button type="submit" class="btn btn-primary" ng-disabled="masterproductgroupsCreateForm.$invalid">Save & Close</button>
+            <button type="button" class="btn btn-default" ui-sref="^">Cancel</button>
+        </div>
+    </div>
+    <em>* Required fields</em><br/><br/>
+    <div class="row">
+        <div class="form-group col-sm-6">
+            <label for="templateName">Product Group Name*</label>
+            <input id="templateName" type="text" class="form-control" ng-model="masterproductgroupsCreate.category.Name" ng-required="true" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-sm-6">
+
+            <label for="templateName">Add Search Groups</label>
+
+            <div class="row">
+                <div class="col-sm-6 form-group">
+                    <input id="specValueInput" type="text" ng-disabled="specEdit.spec.xp.isMediaAttribute" class="form-control" ng-model="masterproductgroupsCreate.temp" />
+                </div>
+
+                <div class="col-sm-6 form-group" style="padding-left: 0px;">
+                    <button type="button" user-permissions pbit="4" pobj="masterproductgroups" class="btn btn-primary" ng-click="masterproductgroupsCreate.addGroupProp()" ng-disabled="!masterproductgroupsCreate.temp">Add</button>
+                </div>
+            </div>
+
+
+
+
+            <div class="col-sm-6 form-group" style="padding: 0px">
+
+
+
+                <div class="table-container" ng-show="masterproductgroupsCreate.category.xp.GroupProperties.length == 0" style="opacity: .5; margin-left: 10px;"><em>No Search Groups Assigned</em></div>
+
+                <div class="table-container" ng-show="masterproductgroupsCreate.category.xp.GroupProperties.length > 0">
+                    <table class="table table-hover form-group">
+                        <thead>
+                            <tr>
+                                <th col-span="3" style="border-bottom: 0px;">
+                                    <div ng-click="masterproductgroupsCreate.masterproductgroups()"> <a href="#" role="button">Search Groups</a></div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="props in masterproductgroupsCreate.category.xp.GroupProperties | orderBy: 'Value':specEdit._sortOptions  track by $index">
+
+                                <td ng-hide="canEdit" style="">{{props.Name}}</td>
+                                <td class="text-center" style="width: 10px;">
+                                    <a class="fa fa-trash text-danger" ng-click="masterproductgroupsCreate.deleteProperty($index)"></a>
+                                </td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+        </div>
+        <div class="row" style="Display: none">
+            <div class="form-group col-sm-6">
+                <label for="categoryActiveInput">
+                <input id="categoryActiveInput" type="checkbox" ng-model="masterproductgroupsCreate.category.Active"/>
+                Active
+            </label>
+            </div>
+        </div>
+        <!--<br /><br /><btn class="btn btn-primary" data-toggle="collapse" data-target="#rawData">Debug: Show Raw Data</btn>
+<div id="rawData" class="collapse">
+        <pre><code>{{masterproductgroupsCreate.category}}</code></pre>
+</div>-->
+</form>

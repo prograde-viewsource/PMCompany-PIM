@@ -1,0 +1,88 @@
+<article id="COMPONENT_Categories" ui-view class="container-fluid">
+    <div class="page-header">
+        <div class="btn-toolbar pull-right">
+            <button type="button" class="btn btn-success" user-permissions pbit="2" pobj="masterproductgroups" ui-sref=".create"><i class="fa fa-plus-circle"></i> Create New</button>
+        </div>
+        <h3>Master Product Groups</h3>
+    </div>
+
+    <!--====== SEARCH/FILTERS ======-->
+    <form name="CategoriesSearchForm" class="form-inline" ng-submit="masterproductgroups.search()">
+        <div class="row">
+            <div class="form-group col-xs-12 col-sm-6">
+                <fieldset class="form-group">
+                    <input type="search" placeholder="Search..." ng-model="masterproductgroups.parameters.search" class="form-control">
+                </fieldset>
+                <fieldset class="form-group" ng-class="{'text-center':application.$ocMedia('max-width:767px')}">
+                    <span ng-class="{'btn-group':masterproductgroups.searchResults}">
+                        <button type="submit" class="btn btn-primary" user-permissions pbit="1" pobj="masterproductgroups">Search</button>
+                        <button ng-if="masterproductgroups.searchResults" ng-click="masterproductgroups.clearSearch()" type="button" class="btn btn-default"><i class="fa fa-times"></i></button>
+                    </span>
+                    <span ng-class="{'btn-group':masterproductgroups.filtersApplied}" ng-if="application.$ocMedia('max-width:767px')">
+                        <button type="button" class="btn btn-default" ng-click="masterproductgroups.showFilters = !masterproductgroups.showFilters"><i class="fa fa-filter"></i> Filters</button>
+                        <button ng-if="masterproductgroups.filtersApplied" ng-click="masterproductgroups.clearFilters()" type="button" class="btn btn-default"><i class="fa fa-times"></i></button>
+                    </span>
+                </fieldset>
+            </div>
+        </div>
+    </form>
+    <div class="row" style="margin-top:15px;" uib-collapse="!masterproductgroups.showFilters">
+        <div class="col-md-6 col-lg-4">
+            <div class="form-group" ng-if="application.$ocMedia('max-width:767px')">
+                <label>Sorty By:</label>
+                <div ng-class="{'input-group':masterproductgroups.sortSelection}">
+                    <select placeholder="Sort" class="form-control" ng-model="masterproductgroups.sortSelection" ng-change="masterproductgroups.updateSort()">
+                        <option value="">None</option>
+                        <option value="ID">ID</option>
+                        <option value="Name">Name</option>
+                    </select>
+                    <div ng-if="masterproductgroups.sortSelection" class="input-group-btn">
+                        <button class="btn btn-default" ng-click="masterproductgroups.reverseSort()">
+                            <i class="fa fa-sort"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--====== LIST ======-->
+    <div class="no-matches" ng-if="!masterproductgroups.list.Items.length">
+        <b>No matches found.</b>
+    </div>
+    <div ng-if="masterproductgroups.list.Items.length">
+        <b class="pull-right">{{(application.$ocMedia('min-width:768px') ? masterproductgroups.list.Meta.ItemRange[0] : '1') + ' - ' +  masterproductgroups.list.Meta.ItemRange[1] + ' of ' + masterproductgroups.list.Meta.TotalCount + ' results'}}</b>
+        <table class="table table-hover oc-table-responsive" servicename="Categories" controlleras="categories">
+            <thead>
+                <tr>
+                    <th scope="col">
+                        <a href="#" role="button" ng-click="masterproductgroups.updateSort('Name')">
+                        Name
+                        <i class="fa fa-caret-down" ng-show="masterproductgroups.parameters.sortBy == 'Name'"></i>
+                        <i class="fa fa-caret-up" ng-show="masterproductgroups.parameters.sortBy == '!Name'"></i>
+                    </a>
+                    </th>
+                    <th>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="category in masterproductgroups.list.Items | orderBy: 'Name'">
+                    <td data-title="Name">{{category.Name}}</td>
+                    <td class="actions-cell">
+                        <button ui-sref=".edit({categoryid: category.ID})" class="btn btn-default btn-sm" user-permissions pbit="4" pobj="masterproductgroups">Edit</button>
+                        <!-- <button ui-sref=".clone({categoryid: category.ID})" class="btn btn-default btn-sm" user-permissions pbit="2" pobj="masterproductgroups">Clone</button> !-->
+                        <button ui-sref=".assign({categoryid: category.ID})" class="btn btn-default btn-sm" user-permissions pbit="4" pobj="masterproductgroups">Assign Product Groups</button>
+                        <!-- <button ui-sref=".assignProduct({categoryid: category.ID})" class="btn btn-default btn-sm" user-permissions pbit="4" pobj="masterproductgroups">Assign Products</button> !-->
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="text-center" ng-if="application.$ocMedia('min-width:768px') && masterproductgroups.list.Meta.TotalPages > 1" ">
+        <uib-pagination boundary-links="masterproductgroups.list.Meta.TotalPages> 5" max-size="5" total-items="masterproductgroups.list.Meta.TotalCount" items-per-page="masterproductgroups.list.Meta.PageSize" ng-model="masterproductgroups.list.Meta.Page" ng-change="masterproductgroups.pageChanged()">
+            </uib-pagination>
+        </div>
+        <button type="button" ng-if="application.$ocMedia('max-width:767px')" class="btn btn-default btn-block btn-lg" ng-show="masterproductgroups.list.Meta.Page < masterproductgroups.list.Meta.TotalPages" ng-click="masterproductgroups.loadMore()" user-permissions
+            pbit="1" pobj="masterproductgroups">Load More</button>
+    </div>
+</article>

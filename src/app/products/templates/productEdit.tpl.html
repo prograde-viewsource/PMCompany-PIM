@@ -1,0 +1,128 @@
+<h3 class="page-header">
+    <b>Edit Product:</b> {{productEdit.productName}}
+</h3>
+<form name="EditForm" ng-submit="productEdit.Submit(true)" novalidate>
+    <div class="row">
+        <div class="form-group edit-button-group" ng-click="EditForm.$valid">
+            <button type="button" class="btn btn-primary" user-permissions pbit="4" pobj="products" ng-click="EditForm.$valid && productEdit.Submit(false)" ng-disabled="EditForm.$invalid">{{'Save' | i18next}}</button>
+            <button type="submit" class="btn btn-primary" user-permissions pbit="4" pobj="products" ng-disabled="EditForm.$invalid">{{'Save & Close' | i18next}}</button>
+            <button type="button" class="btn btn-default" ui-sref="^">{{'Cancel' | i18next}}</button>
+            <button type="button" class="btn btn-default" user-permissions pbit="8" pobj="products" ng-click="productEdit.Delete()"><i class="fa fa-trash text-danger"></i></button>
+        </div>
+    </div>
+    <em>* Required fields</em><br/><br/>
+    <div class="row">
+        <div class="form-group col-sm-6">
+            <label for="productIDInput">{{'Part Number' | i18next}}*</label>
+            <input id="productIDInput" type="text" class="form-control" ng-disabled="productEdit.protected.includes('ID')" user-permissions pbit="4" pobj="Basic Attributes" pattern="([A-Za-z0-9-_\/]+)" pattern-err-type="ID_Name" ng-model="productEdit.product.ID"
+                ng-required="true" parse-slash />
+        </div>
+        <div class="col-sm-6 form-group">
+            <label for="productSAPDescriptionInput">{{'ERP Description' | i18next}}*</label>
+            <input id="productSAPDescriptionInput" type="text" user-permissions pbit="4" ng-if="!productEdit.erp_as_product_name" pobj="Basic Attributes" ng-required="true" class="form-control" ng-disabled="productEdit.protected.includes('SAP-Description')" ng-model="productEdit.product.xp['SAP-Description']"></input>
+            <input id="productSAPDescriptionInput" ng-if="productEdit.erp_as_product_name" type="text" user-permissions pbit="4" pobj="Basic Attributes" ng-disabled="productEdit.protected.includes('Name')" ng-required="true" class="form-control" ng-model="productEdit.product.Name"></input>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 form-group">
+            <label for="productDescriptionInput">{{'Long Description' | i18next}}</label>
+            <textarea id="productDescriptionInput" type="text" user-permissions pbit="4" pobj="Basic Attributes" class="form-control" style="min-height: 125px;" ng-disabled="productEdit.protected.includes('Description')" ng-model="productEdit.product.Description"></textarea>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 form-group">
+
+            <label ng-if="!productEdit.erp_as_product_name" for="productNameInput">{{'Short Description' | i18next}}*</label>
+            <input ng-if="!productEdit.erp_as_product_name" id="productNameInput" type="text" class="form-control" user-permissions pbit="4" ng-disabled="productEdit.protected.includes('Name')" pobj="Basic Attributes" ng-model="productEdit.product.Name" ng-required="true"
+                parse-slash />
+
+            <label ng-if="productEdit.erp_as_product_name" for="productNameInput">{{'Short Description' | i18next}}</label>
+            <input ng-if="productEdit.erp_as_product_name" id="productNameInput" type="text" class="form-control" user-permissions pbit="4" ng-disabled="productEdit.protected.includes('Short-Description')" pobj="Basic Attributes" ng-model="productEdit.product.xp['Short-Description']"
+                ng-required="false" parse-slash />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 form-group">
+            <label for="productStatusInput">{{'Status' | i18next}}*</label>
+            <select id="productStatusInput" class="form-control" user-permissions pbit="4" pobj="Basic Attributes" ng-disabled="productEdit.protected.includes('xp.Status')" ng-model="productEdit.product.xp.Status" ng-required="true">
+                 <option ng-repeat="opt in productEdit.options.product_status" value="{{opt[0]}}">{{opt[1] | i18next}}</option>
+            </select>
+        </div>
+
+        <div class="col-md-3 form-group">
+            <label for="productBrandInput">{{'Brand Name' | i18next}}</label>
+            <select id="productStatusInput" class="form-control" user-permissions pbit="4" pobj="Basic Attributes" ng-disabled="productEdit.protected.includes('xp.Brand-Name')" ng-model="productEdit.product.xp['Brand-Name']" ng-required="false">
+                            <option ng-repeat="opt in productEdit.options.brands" value="{{opt[0]}}">{{opt[1] | i18next}}</option>
+            </select>
+        </div>
+        <div class="col-md-3 form-group">
+            <label for="productGroupInput">{{'Search Group' | i18next}}</label>
+            <select id="productGroupInput" class="form-control" user-permissions pbit="4" pobj="Basic Attributes" ng-model="productEdit.product.xp['Master-Product-Group-XP']" ng-selected="productEdit.product.xp['Master-Product-Group-XP'] == option.Name" ng-options="option.Name as option.Name for option in productEdit.masterProductGroupXP"
+            />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 form-group">
+            <label for="productUPCInput">{{'UPC' | i18next}}</label>
+            <input id="productUPCInput" type="text" class="form-control" user-permissions pbit="4" pobj="Basic Attributes" ng-disabled="productEdit.protected.includes('UPC-Each')" ng-model="productEdit.product.xp['UPC-Each']" />
+        </div>
+        <div class="col-md-6 form-group">
+            <label for="productGroupInput">{{'Product Group' | i18next}}</label>
+            <div class="row">
+                <div class="col-xs-12 col-sm-7">
+                    <select id="productGroupInput" class="form-control" user-permissions pbit="4" pobj="Basic Attributes" ng-disabled="productEdit.protected.includes('Product-Group')" ng-model="productEdit.product.xp['Product-Group']" ng-required="false" ng-options="option.ID as option.Name for option in productEdit.productGroupOptions"
+                    />
+                </div>
+                <div class="col-xs-12 col-sm-5">
+                    <a class="btn btn-default form-control" ng-click="productEdit.applyGroup()" user-permissions pbit="4" pobj="Basic Attributes">{{'Apply Group' | i18next}}</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 form-group" ng-if="productEdit.noSpecs">
+            <div class="alert alert-warning" style="text-align: center">
+                <strong>Warning!</strong> The selected Product Group has no attributes assigned to it.
+            </div>
+        </div>
+        <div class="col-md-12 form-group">
+            <uib-accordion close-others="true">
+
+                <div uib-accordion-group class="panel-default" template-url="products/templates/groupHeaderTemplate.tpl.html" heading="{{group.Name | TempFixRegulation}}" ng-repeat="group in productEdit.specGroups | orderBy:productEdit.CustomListOrder">
+                    <div ng-repeat="spec in group.Specs | orderBy: '-Name'">
+                        <div class="form-group col-sm-10">
+                            <label style="display: block" ng-if="spec.OptionCount == 0 || (spec.OptionCount > 0 && !spec.xp.Multiselect)">{{spec.Name}}<span ng-show="spec.Required">*</span></label>
+
+                            <input type="text" class="form-control" user-permissions pbit="4" pobj="{{group.Name}}" ng-disabled="productEdit.protected.includes(spec.ID)" ng-model="spec.Assignment.DefaultValue" ng-if="spec.OptionCount == 0 && !spec.xp.isMediaAttribute" />
+
+                            <input type="text" readonly="true" class="form-control" user-permissions pbit="4" pobj="{{group.Name}}" ng-disabled="productEdit.protected.includes(spec.ID)" ng-model="spec.Assignment.DefaultValue" ng-if="spec.OptionCount == 0 && spec.xp.isMediaAttribute"
+                                style="display: inline; width: 70%;" />
+
+                            <div class="btn btn-default" user-permissions pbit="4" pobj="{{group.Name}}" ng-click="productEdit.OpenAssetManager(spec)" style="display: inline;" ng-if="spec.OptionCount == 0 && spec.xp.isMediaAttribute">{{'Open File Viewer' | i18next}}</div>
+
+                            <select type="text" class="form-control" user-permissions pbit="4" pobj="{{group.Name}}" ng-options="option.ID as option.Value for option in spec.xp.Options | orderBy: 'Value'" ng-disabled="productEdit.protected.includes(spec.ID)" ng-model="spec.Assignment.DefaultOptionID"
+                                ng-if="spec.OptionCount > 0 && !spec.xp.Multiselect"></select>
+
+                            <div close-others="false" ng-if="spec.OptionCount > 0 && spec.xp.Multiselect && !spec.xp.isMediaAttribute">
+
+                                <label>{{spec.Name}}</label>
+                                <br/>
+                                <label ng-repeat="option in spec.xp.Options track by $index" style="font-weight: normal">
+                                        <input name="{{'option_' + $index}}" user-permissions pbit="4" pobj="{{group.Name}}"  type="checkbox" class="form-control" ng-change="productEdit.updateMultiSelect(spec)" ng-model="productEdit.multiSelects[spec.ID][option.ID]" style="width: 15px;box-shadow: none;     height: 15px;">&nbsp;{{option.Value}}
+                                     <br/>
+                                    </label>
+
+                            </div>
+                        </div>
+                    </div>
+            </uib-accordion>
+            </div>
+        </div>
+    </div>
+    <div class="alert alert-warning" ng-show="productEdit.missingSpecs.length"><i class="fa fa-warning" /> {{'This product is missing the following attribute values' | i18next}} <br>
+        <ul ng-repeat="spec in productEdit.missingSpecs">
+            <li>{{spec}}</li>
+        </ul>
+    </div>
+</form>

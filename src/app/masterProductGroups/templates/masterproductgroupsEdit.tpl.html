@@ -1,0 +1,85 @@
+<h3 class="page-header">
+    <b>Edit Master Product Group:</b> {{masterproductgroupsEdit.categoryName}}
+</h3>
+<form name="masterproductgroupsEditForm" ng-submit="masterproductgroupsEdit.Submit(true)" novalidate>
+    <div class="row">
+        <div class="form-group edit-button-group">
+            <button type="button" class="btn btn-primary" ng-click="masterproductgroupsEdit.Submit(false)" ng-disabled="masterproductgroupsEditForm.$invalid" user-permissions pbit="4" pobj="masterproductgroups">Save</button>
+            <button type="submit" class="btn btn-primary" ng-disabled="masterproductgroupsEditForm.$invalid" user-permissions pbit="4" pobj="masterproductgroups">Save & Close</button>
+            <button type="button" class="btn btn-default" ui-sref="^">Cancel</button>
+            <button type="button" class="btn btn-default" ng-click="masterproductgroupsEdit.Delete()" user-permissions pbit="8" pobj="masterproductgroups"><i class="fa fa-trash text-danger"></i></button>
+        </div>
+    </div>
+    <em>* Required fields</em><br/><br/>
+    <div class="row">
+        <div class="form-group col-sm-6">
+            <label for="templateName">Group Name*</label>
+            <input id="templateName" type="text" class="form-control" ng-model="masterproductgroupsEdit.category.Name" ng-required="true" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-sm-6">
+
+            <label for="templateName">Add Search Groups</label>
+
+            <div class="row">
+                <div class="col-sm-6 form-group">
+                    <input id="specValueInput" type="text" ng-disabled="specEdit.spec.xp.isMediaAttribute" class="form-control" ng-model="masterproductgroupsEdit.temp" />
+                </div>
+
+                <div class="col-sm-6 form-group" style="padding-left: 0px;">
+                    <button type="button" user-permissions pbit="4" pobj="masterproductgroups" class="btn btn-primary" ng-click="masterproductgroupsEdit.addGroupProp()" ng-disabled="!masterproductgroupsEdit.temp">Add</button>
+                </div>
+            </div>
+
+
+
+
+            <div class="col-sm-6 form-group" style="padding: 0px">
+
+
+
+                <div class="table-container" ng-show="masterproductgroupsEdit.category.xp.GroupProperties.length == 0" style="opacity: .5; margin-left: 10px;"><em>No Search Groups Assigned</em></div>
+
+                <div class="table-container" ng-show="masterproductgroupsEdit.category.xp.GroupProperties.length > 0">
+                    <table class="table table-hover form-group">
+                        <thead>
+                            <tr>
+                                <th col-span="3" style="border-bottom: 0px;">
+                                    <div ng-click="masterproductgroupsEdit.masterproductgroups()"> <a href="#" role="button">Search Groups</a></div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="props in masterproductgroupsEdit.category.xp.GroupProperties | orderBy: 'Value':specEdit._sortOptions  track by $index">
+
+                                <td ng-hide="canEdit" style="">{{props.Name}}</td>
+                                <td class="text-center" style="width: 10px;">
+                                    <a class="fa fa-trash text-danger" ng-click="masterproductgroupsEdit.deleteProperty($index)"></a>
+                                </td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="form-group col-sm-3">
+
+
+            </div>
+        </div>
+
+
+        <div class="row" style="Display: none">
+            <div class="form-group col-sm-6">
+                <label for="categoryActiveInput">
+                <input id="categoryActiveInput" type="checkbox" ng-model="masterproductgroupsEdit.category.Active"/>
+                Active
+            </label>
+            </div>
+        </div>
+</form>

@@ -1,0 +1,15 @@
+language: node_js
+
+node_js:
+  - 6
+  - 5
+
+before_install:
+  - npm install -g gulp
+  - npm install -g bower
+  - npm install -g typescript
+  - npm install -g rollup
+  - bower install
+
+script:
+  - gulp ci

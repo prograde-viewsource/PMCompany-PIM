@@ -1,0 +1,142 @@
+<h3 class="page-header">
+    <b>Assign Products to Distribution Template:</b> {{DataJobAssignProd.Category.Name}}
+</h3>
+<div class="row">
+    <div class="form-group edit-button-group">
+        <button type="button" class="btn btn-default" ui-sref="^"><i class="fa fa-arrow-left"></i> Back</button>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6 form-group">
+        <label for="productGroupFilter">Filter by Group:</label>
+        <select id="productGroupFilter" class="form-control" ng-model="DataJobAssignProd.groupFilter" ng-change="DataJobAssignProd.research()" ng-options="option.ID as option.Name group by option.Type for option in DataJobAssignProd.productGroups">
+            <option value="">Show All</option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label>Filter by Search:</label>
+        <div class="form-group">
+            <input type="search" class="form-control" placeholder="Search Products..." ng-model="DataJobAssignProd.searchFilter" ng-change="DataJobAssignProd.research()" parse-slash />
+        </div>
+    </div>
+    <div class="col-md-2 form-group">
+
+        <div class="col-md-1" style="padding: 0px; margin-top:25px;">
+            <div style="position: relative; left: -13px; top: 6px;"><strong>by</strong></div>
+        </div>
+        <div class="col-md-11" style="padding: 0px; margin-top:25px;">
+            <select id="statusFilter" class="form-control" ng-model="DataJobAssignProd.searchby" ng-change="DataJobAssignProd.research()">
+                    <option ng-repeat="opt in DataJobAssignProd.options.search_by" value="{{opt[0]}}">{{opt[1] | i18next}}</option>
+                </select>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 form-group">
+        <label for="statusFilter">{{'Filter by Status' | i18next}}:</label>
+        <select id="statusFilter" class="form-control" ng-model="DataJobAssignProd.statusFilter" ng-change="DataJobAssignProd.research()">
+             <option value="">{{'Show All' | i18next}}</option>
+           <option ng-repeat="opt in DataJobAssignProd.options.product_status" value="{{opt[0]}}">{{opt[1] | i18next}}</option>
+        </select>
+    </div>
+    <div class="col-md-6 form-group">
+        <label>Filter by Brand:</label>
+        <select id="brandFilter" class="form-control" ng-model="DataJobAssignProd.brandFilter" ng-change="DataJobAssignProd.research()">
+             <option value="">{{'Show All' | i18next}}</option>
+           <option ng-repeat="opt in DataJobAssignProd.options.brands" value="{{opt[0]}}">{{opt[1] | i18next}}</option>
+        </select>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-6" ng-click="DataJobAssignProd.toggleListFilter()" ng-init="DataJobAssignProd.listFilter = true">
+        <div class="btn full-width" ng-class="DataJobAssignProd.listFilter ? 'btn-primary' : 'btn-default'">Apply filter to Product list <i class="fa" ng-class="DataJobAssignProd.listFilter ? 'fa-check-square-o' : 'fa-square-o'" /></div>
+    </div>
+    <div class="col-xs-6" ng-click="DataJobAssignProd.toggleAssignFilter()" ng-init="DataJobAssignProd.assignedFilter = true">
+        <div class="btn full-width" ng-class="DataJobAssignProd.assignedFilter ? 'btn-primary' : 'btn-default'">Apply filter to assigned Product list <i class="fa" ng-class="DataJobAssignProd.assignedFilter ? 'fa-check-square-o' : 'fa-square-o'" /></div>
+    </div>
+    <br /> <br />
+</div>
+<div class="row">
+    <div class="col-xs-6">
+        <div class='scroll-count'>Showing <strong>{{DataJobAssignProd.list.Items.length}}</strong> of <strong>{{DataJobAssignProd.list.Items.length > 0 ? DataJobAssignProd.list.Meta.TotalCount : 0}}</strong></div>
+        <section class="table-fixed-header no-margin">
+
+            <div class="table-header-bg"></div>
+            <div class="table-container" ordercloud-infinite-scroll servicename="Products" pagingfunction="listPagingFunction" controlleras="DataJobAssignProd" idname="ID" disable-dynamic-validation ng-style="DataJobAssignProd.leftDragColMaxheight">
+                <table class="table table-hover">
+                    <colgroup>
+                        <col class="action-column" />
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th class="tool-th">
+                                <div class="tool-div">
+                                    <span class="select-all" ng-click="DataJobAssignProd.SelectAll()">Assign All <i class="fa fa-caret-right"></i></span>
+                                </div>
+                            </th>
+                            <th>
+                                <div ng-click="DataJobAssignProd.sortBy('ID')">Part Number<span class="sortorder" ng-show="DataJobAssignProd.propertyName === 'ID'" ng-class="{reverse: DataJobAssignProd.reverse}"></span></div>
+                            </th>
+                            <th>
+                                <div ng-click="DataJobAssignProd.sortBy('Name')">Name <span class="sortorder" ng-show="DataJobAssignProd.propertyName === 'Name'" ng-class="{reverse: DataJobAssignProd.reverse}"></span></div>
+                            </th>
+
+
+                        </tr>
+                    </thead>
+                    <tbody dragula="'drag-bag'" dragula-model="DataJobAssignProd.list.Items" class="oc-table-responsive">
+                        <tr ng-repeat="spec in  DataJobAssignProd.list.Items">
+                            <td class="text-center tool-td"><i id="handle" class="fa fa-arrows"></i> <i class="fa fa-caret-right" ng-click="DataJobAssignProd.pushOver(spec)"></i></td>
+                            <td data-title="Id" class="part-number-td">{{spec.ID}}</td>
+                            <td data-title="Name">{{spec.Name}}</td>
+                        </tr>
+                        <tr ng-if="!DataJobAssignProd.list.Items.length">
+                            <td class="alert alert-info" colspan="3">No matches found.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+    <div class="col-xs-6">
+        <div class='scroll-count'>Showing <strong>{{DataJobAssignProd.prodAssignments.Items.length}}</strong> of <strong>{{DataJobAssignProd.prodAssignments.Meta.TotalCount}}</strong></div>
+        <section class="table-fixed-header no-margin">
+            <div class="table-header-bg"></div>
+            <div class="table-container" servicename="Specs" controlleras="DataJobAssignProd" idname="SpecID" disable-dynamic-validation ng-style="DataJobAssignProd.leftDragColMaxheight">
+                <table class="table table-hover">
+                    <colgroup>
+                        <col class="action-column" />
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th class="tool-th">
+                                <div class="tool-div">
+                                    <span class="select-all" style="position: relative; left: -20px;" ng-click="DataJobAssignProd.DeselectAll()"><i class="fa fa-caret-left"></i> Unassign All</span>
+                                </div>
+                            </th>
+                            <th>
+                                <div ng-click="DataJobAssignProd.sortBy('ID')">Part Number<span class="sortorder" ng-show="DataJobAssignProd.propertyName === 'ID'" ng-class="{reverse: DataJobAssignProd.reverse}"></span></div>
+                            </th>
+                            <th>
+                                <div ng-click="DataJobAssignProd.sortBy('Name')">Name <span class="sortorder" ng-show="DataJobAssignProd.propertyName === 'Name'" ng-class="{reverse: DataJobAssignProd.reverse}"></span></div>
+                            </th>
+
+                        </tr>
+                    </thead>
+                    <tbody dragula="'drag-bag'" dragula-model="DataJobAssignProd.prodAssignments.Items" id="right-drag-col">
+                        <tr ng-repeat="spec in  DataJobAssignProd.prodAssignments.Items">
+                            <td class="text-center tool-td"><i id="handle" class="fa fa-arrows"></i> <i class="fa fa-caret-left" ng-click="DataJobAssignProd.pushBack(spec)"></i></td>
+                            <td data-title="Id" class="part-number-td">{{spec.ID}}</td>
+                            <td data-title="Name">{{spec.Name}}</td>
+                        </tr>
+                        <tr ng-if="!DataJobAssignProd.prodAssignments.Items.length">
+                            <td class="alert alert-info" colspan="3">No matches found.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>

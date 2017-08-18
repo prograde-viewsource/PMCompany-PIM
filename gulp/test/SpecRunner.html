@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Jasmine Spec Runner v2.4.1</title>
+
+    <!-- jasmine:css -->
+    <link rel="stylesheet" href="/node_modules/jasmine-core/lib/jasmine-core/jasmine.css">
+    <!-- endinject -->
+
+    <!-- jasmine:js -->
+    <script src="/node_modules/jasmine-core/lib/jasmine-core/jasmine.js"></script>
+    <script src="/node_modules/jasmine-core/lib/jasmine-core/jasmine-html.js"></script>
+    <script src="/node_modules/jasmine-core/lib/jasmine-core/boot.js"></script>
+    <!-- endinject -->
+
+    <!-- include bower files here... -->
+    <!-- bower:js -->
+    <script src="/bower_components/jquery/dist/jquery.js"></script>
+    <script src="/bower_components/angular/angular.js"></script>
+    <script src="/bower_components/angular-animate/angular-animate.js"></script>
+    <script src="/bower_components/angular-sanitize/angular-sanitize.js"></script>
+    <script src="/bower_components/angular-touch/angular-touch.js"></script>
+    <script src="/bower_components/angular-messages/angular-messages.js"></script>
+    <script src="/bower_components/angular-toastr/dist/angular-toastr.tpls.js"></script>
+    <script src="/bower_components/angular-ui-tree/dist/angular-ui-tree.js"></script>
+    <script src="/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <script src="/bower_components/angular-resource/angular-resource.js"></script>
+    <script src="/bower_components/angular-cookies/angular-cookies.js"></script>
+    <script src="/bower_components/angular-auto-validate/dist/jcs-auto-validate.js"></script>
+    <script src="/bower_components/snapjs/snap.js"></script>
+    <script src="/bower_components/localforage/dist/localforage.js"></script>
+    <script src="/bower_components/underscore/underscore.js"></script>
+    <script src="/bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+    <script src="/bower_components/angular-busy/dist/angular-busy.js"></script>
+    <script src="/bower_components/signalr/jquery.signalR.js"></script>
+    <script src="/bower_components/angular-dragula/dist/angular-dragula.js"></script>
+    <script src="/bower_components/angular-bit/src/angular-bit.js"></script>
+    <script src="/bower_components/i18next/i18next.min.js"></script>
+    <script src="/bower_components/i18next-xhr-backend/i18nextXHRBackend.js"></script>
+    <script src="/bower_components/angular-mocks/angular-mocks.js"></script>
+    <script src="/bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="/bower_components/ordercloud-ng-sdk/dist/ordercloud-ng-sdk.js"></script>
+    <script src="/bower_components/angular-snap/angular-snap.js"></script>
+    <script src="/bower_components/angular-localforage/dist/angular-localForage.js"></script>
+    <script src="/bower_components/ng-i18next/dist/ng-i18next.js"></script>
+    <!-- endinject -->
+
+    <!-- include source files here... -->
+    <!-- inject:js -->
+    <script src="/build/app/app.js"></script>
+    <script src="/build/app/app.config.js"></script>
+    <script src="/build/app/account/account.js"></script>
+    <script src="/build/app/adminUserGroups/adminUserGroups.js"></script>
+    <script src="/build/app/adminUsers/adminUsers.js"></script>
+    <script src="/build/app/base/base.js"></script>
+    <script src="/build/app/catalog/catalog.js"></script>
+    <script src="/build/app/categories/categories.js"></script>
+    <script src="/build/app/channels/channels.js"></script>
+    <script src="/build/app/common/auditLogger.js"></script>
+    <script src="/build/app/common/extend.js"></script>
+    <script src="/build/app/common/pim-helpers.js"></script>
+    <script src="/build/app/common/user-permissions.js"></script>
+    <script src="/build/app/dataManager/dataManager.js"></script>
+    <script src="/build/app/home/home.js"></script>
+    <script src="/build/app/login/login.js"></script>
+    <script src="/build/app/orders/orders.js"></script>
+    <script src="/build/app/productGroups/productgroups.js"></script>
+    <script src="/build/app/products/products.js"></script>
+    <script src="/build/app/services/apiAgent.js"></script>
+    <script src="/build/app/services/apiConsumer.js"></script>
+    <script src="/build/app/services/auditLogService.js"></script>
+    <script src="/build/app/services/FullOrderCloud.js"></script>
+    <script src="/build/app/services/fullProductService.js"></script>
+    <script src="/build/app/services/resourceService.js"></script>
+    <script src="/build/app/services/userGroupsService.js"></script>
+    <script src="/build/app/services/userPermissionsService.js"></script>
+    <script src="/build/app/specs/specs.js"></script>
+    <script src="/build/app/unauthorized/unauthorized.js"></script>
+    <script src="/build/app/catalog/category/category.js"></script>
+    <script src="/build/app/catalog/product/ordercloud-order-input.js"></script>
+    <script src="/build/app/catalog/product/product.js"></script>
+    <script src="/build/app/catalog/productQuickView/productQuickView.js"></script>
+    <script src="/build/app/catalog/products/products.js"></script>
+    <script src="/build/app/common/address/address.js"></script>
+    <script src="/build/app/common/auto-id/auto-id.js"></script>
+    <script src="/build/app/common/buyer-select/ordercloud-buyer-selected.js"></script>
+    <script src="/build/app/common/confirmPassword/confirmPassword.js"></script>
+    <script src="/build/app/common/current-order/current-order.js"></script>
+    <script src="/build/app/common/files/files.js"></script>
+    <script src="/build/app/common/helper-factories/assignment-helpers.js"></script>
+    <script src="/build/app/common/helper-factories/paging-helpers.js"></script>
+    <script src="/build/app/common/geography/geography.js"></script>
+    <script src="/build/app/common/infinite-scroll/infinite-scroll.js"></script>
+    <script src="/build/app/common/lineitems/lineitems.js"></script>
+    <script src="/build/app/common/localforage/localforage.config.js"></script>
+    <script src="/build/app/common/media/ordercloud.media.js"></script>
+    <script src="/build/app/common/ordercloud-logo/ordercloud_logo.js"></script>
+    <script src="/build/app/common/ordercloud-parameters/ordercloud-parameters.js"></script>
+    <script src="/build/app/common/parse-slash/parse-slash.js"></script>
+    <script src="/build/app/common/search/search.js"></script>
+    <script src="/build/app/common/token-refresh/token-refresh.js"></script>
+    <script src="/build/app/common/underscore/underscore.factory.js"></script>
+    <script src="/build/app/orders/tests/orders.js"></script>
+    <!-- endinject -->
+
+    <!-- include spec files here... -->
+    <!-- spec:js -->
+    <script src="/src/app/account/tests/account.spec.js"></script>
+    <script src="/src/app/adminUserGroups/tests/adminUserGroups.spec.js"></script>
+    <script src="/src/app/adminUsers/tests/admiunUsers.spec.js"></script>
+    <script src="/src/app/base/tests/base.spec.js"></script>
+    <script src="/src/app/catalog/test/catalog.spec.js"></script>
+    <script src="/src/app/catalog/test/productQuickView.spec.js"></script>
+    <script src="/src/app/categories/tests/categories.spec.js"></script>
+    <script src="/src/app/channels/tests/buyer.spec.js"></script>
+    <script src="/src/app/login/tests/login.spec.js"></script>
+    <script src="/src/app/orders/tests/orders.spec.js"></script>
+    <script src="/src/app/productGroups/tests/categories.spec.js"></script>
+    <script src="/src/app/products/tests/products.spec.js"></script>
+    <script src="/src/app/specs/tests/specs.spec.js"></script>
+    <script src="/src/app/catalog/category/tests/category.spec.js"></script>
+    <script src="/src/app/catalog/product/tests/ordercloud-order-input.spec.js"></script>
+    <script src="/src/app/catalog/product/tests/product.spec.js"></script>
+    <script src="/src/app/catalog/products/tests/products.spec.js"></script>
+    <script src="/src/app/common/auto-id/tests/auto-id.spec.js"></script>
+    <script src="/src/app/common/buyer-select/tests/buyer-select.spec.js"></script>
+    <script src="/src/app/common/files/tests/files.spec.js"></script>
+    <script src="/src/app/common/helper-factories/tests/assignment-helpers.spec.js"></script>
+    <script src="/src/app/common/helper-factories/tests/paging-helpers.spec.js"></script>
+    <script src="/src/app/common/infinite-scroll/tests/infinite-scroll.spec.js"></script>
+    <script src="/src/app/common/ordercloud-logo/tests/ordercloud_logo.spec.js"></script>
+    <script src="/src/app/common/search/tests/search.spec.js"></script>
+    <!-- endinject -->
+</head>
+
+<body></body>
+
+</html>

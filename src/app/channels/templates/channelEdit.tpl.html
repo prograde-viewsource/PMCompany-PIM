@@ -1,0 +1,47 @@
+<h3 class="page-header">
+    <b>{{'Edit Channel' | i18next}}:</b> {{channelEdit.buyerName}}
+</h3>
+<form ng-submit="channelEdit.Submit(true)" name="channelEditForm" novalidate>
+    <div class="row">
+        <div class="form-group edit-button-group">
+            <button class="btn btn-primary" ng-click="channelEdit.Submit(false)" user-permissions pbit="4" pobj="channels" type="button" ng-disabled="channelEditForm.$invalid">Save</button>
+            <button class="btn btn-primary" user-permissions pbit="4" pobj="channels" type="submit" ng-disabled="channelEditForm.$invalid">Save & Close</button>
+            <button class="btn btn-default" ui-sref="^" type="button">Cancel</button>
+            <button class="btn btn-danger" user-permissions pbit="8" pobj="channels" ng-click="channelEdit.Delete();" type="button"><i class="fa fa-trash"></i></button>
+        </div>
+    </div>
+    <em>* Required fields</em><br/><br/>
+    <div class="row">
+        <!--<div class="form-group col-md-6">
+            <label for="buyer_id">ID</label>
+            <input id="buyer_id" type="text" pattern="([A-Za-z0-9-_]+)" pattern-err-type="ID_Name" ng-model="channelEdit.buyer.ID" class="form-control">
+        </div>-->
+        <div class="form-group col-md-6">
+            <label for="buyer_name">Name*</label>
+            <input id="buyer_name" type="text" ng-model="channelEdit.buyer.Name" class="form-control" required>
+        </div>
+        <div class="form-group col-md-6">
+            <label for="buyer_type">Type*</label>
+            <select id="buyer_type" ng-model="channelEdit.buyer.xp.Type" class="form-control" required>
+               <option ng-repeat="opt in channelEdit.options.buyer_types" value="{{opt[0]}}">{{opt[1] | i18next}}</option>
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <!--<div class="form-group col-md-6">
+            <label for="buyer_analytics">Analytics ID</label>
+            <input id="buyer_analytics" type="text" pattern="([A-Za-z0-9-_]+)" pattern-err-type="ID_Name" ng-model="channelEdit.buyer.xp.analytics_code" class="form-control">
+        </div>-->
+        <div class="form-group col-md-6">
+            <label for="buyer_contact">Contact</label>
+            <input id="buyer_contact" type="text" ng-model="channelEdit.buyer.xp.Contact" class="form-control">
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-md-6">
+            <label for="buyer_active">
+                <input id="buyer_active" type="checkbox" ng-model="channelEdit.buyer.Active"> Active
+            </label>
+        </div>
+    </div>
+</form>

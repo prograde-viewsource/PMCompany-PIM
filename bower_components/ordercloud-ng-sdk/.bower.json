@@ -1,0 +1,33 @@
+{
+  "name": "ordercloud-ng-sdk",
+  "version": "1.0.24",
+  "description": "OrderCloud AngularJS 1.x SDK",
+  "main": "dist/ordercloud-ng-sdk.js",
+  "authors": [
+    "Four51 Inc."
+  ],
+  "license": "MIT",
+  "moduleType": [],
+  "homepage": "https://github.com/ordercloud-api/angular-sdk.git",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "^1.4.8",
+    "angular-resource": "^1.4.8",
+    "angular-cookies": "^1.4.8"
+  },
+  "_release": "1.0.24",
+  "_resolution": {
+    "type": "version",
+    "tag": "v1.0.24",
+    "commit": "5f771f09fb40741d6ff23c3bf96aea5d03bf9101"
+  },
+  "_source": "https://github.com/ordercloud-api/angular-sdk.git",
+  "_target": "*",
+  "_originalSource": "ordercloud-ng-sdk"
+}
