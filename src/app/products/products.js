@@ -122,7 +122,6 @@ function ProductsConfig($stateProvider) {
                         SelectedProduct.xp['Master-Group'] = ProductGroup.xp['Master-Group'];
                         return OrderCloud.Categories.Get(ProductGroup.xp['Master-Group'].ID, 'master-product-groups')
                     } else {
-
                         return {};
                     }
                 },
@@ -130,7 +129,7 @@ function ProductsConfig($stateProvider) {
                     if (SelectedProduct.xp['Product-Group']) {
                         return OrderCloud.Categories.Get(SelectedProduct.xp['Product-Group'], 'product-groups');
                     } else {
-                        return OrderCloud.Categories.Get("fNLP0WEWw0KTv8PRmk1uKw", 'product-groups');
+                        return OrderCloud.Categories.Get("unspecified", 'product-groups');
                     }
 
                 },
