@@ -29,9 +29,10 @@
             ["Internal", "Internal"]
         ],
         "brands": [
-            ["GHENT", "Ghent"],
-            ["WADDELL", "Waddell"],
-            ["VIVIDBOARD", "VividBoard"]
+            ["Perfection", "Perfection"],
+            ["SecurIT", "SecurIT"],
+            ["PM", "PM"],
+            ["NONE", "NONE"]
         ],
         "search_by": [
             [null, "Basic Attributes"],

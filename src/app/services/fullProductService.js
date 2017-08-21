@@ -12,12 +12,12 @@ function FullProductService(OrderCloud, FullOrderCloud, $q) {
         OrderCloud.Products.Get(ProductID).then(function(response) {
             var p = response;
             p.Specs = [];
-            //console.log("--_--------")
-            //console.log(p)
-           // console.log("--0--------")
+            console.log("--_--------")
+            console.log(p)
+            console.log("--0--------")
             if (!_.isNull(specsAssignments)) {
                 angular.forEach(specsAssignments, function(s) {
-                  //  console.log(s)
+                    console.log(s)
                     let blankObj = {
                         "ID": s.ID,
                         "Name": s.Name,
@@ -28,7 +28,7 @@ function FullProductService(OrderCloud, FullOrderCloud, $q) {
                         }
                     };
 
-                    
+
                     if (s.ID === 'ID') {
                         blankObj.DefaultValue = p.ID;
                     }
@@ -71,21 +71,21 @@ function FullProductService(OrderCloud, FullOrderCloud, $q) {
                     if (s.ID === 'ProductGroup') {
                         // if (response.xp['Product-Group']) { blankObj.DefaultValue = ProductGroups[response.xp['Product-Group']].Name; }
                     }
-                  //  console.log(blankObj.DefaultValue)
+                    //  console.log(blankObj.DefaultValue)
                     if (blankObj.DefaultValue !== null)
                         p.Specs.push(blankObj);
                 });
-               // console.log(specsAssignments);
+                // console.log(specsAssignments);
             }
 
             FullOrderCloud.Specs.ListProductAssignments(null, ProductID).then(function(specs) {
                 var q = [];
 
-      
+
                 angular.forEach(specs.Items, function(s) {
-        
+
                     q.push(function() {
-                
+
                         var df = $q.defer();
                         var tempValue = s.DefaultValue;
                         var tempOption = s.DefaultOptionID;
@@ -102,7 +102,7 @@ function FullProductService(OrderCloud, FullOrderCloud, $q) {
                         }
 
                         if (callAPI) {
-                        //    console.log(callAPI)
+                            //    console.log(callAPI)
                             OrderCloud.Specs.Get(s.SpecID).then(function(response) {
                                 s = response;
                                 s.DefaultValue = tempValue;
@@ -118,7 +118,7 @@ function FullProductService(OrderCloud, FullOrderCloud, $q) {
                                     p.Specs.push(s);
                                     df.resolve();
                                 }
-                            }).catch(function(){
+                            }).catch(function() {
                                 df.resolve();
 
                             });
@@ -129,7 +129,7 @@ function FullProductService(OrderCloud, FullOrderCloud, $q) {
                     }());
                 });
                 $q.all(q).then(function() {
-                 
+
                     //console.log(p)
                     uberQ.resolve(p);
                 });
@@ -143,19 +143,19 @@ function FullProductService(OrderCloud, FullOrderCloud, $q) {
         var df = $q.defer();
         OrderCloud.Specs.Get(SpecID).then(function(response) {
             var s = response;
-            if(s.OptionCount){
-            FullOrderCloud.Specs.ListOptions(response.ID).then(function(response) {
-                s.xp.Options = response.Items;
-                df.resolve(s);
-            }).catch(function(){
-                df.resolve(s);
-            });
-            }else{
+            if (s.OptionCount) {
+                FullOrderCloud.Specs.ListOptions(response.ID).then(function(response) {
+                    s.xp.Options = response.Items;
+                    df.resolve(s);
+                }).catch(function() {
+                    df.resolve(s);
+                });
+            } else {
                 df.resolve(s);
             }
-        }).catch(function(err){
+        }).catch(function(err) {
             console.log(err)
-             df.resolve();
+            df.resolve();
         });
         return df.promise;
     }

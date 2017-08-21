@@ -118,10 +118,11 @@ function ProductsConfig($stateProvider) {
                     return FullOrderCloud.Specs.ListProductAssignments(null, $stateParams.productid);
                 },
                 MasterProductGroupXP: function(OrderCloud, SelectedProduct, ProductGroup) {
-                    if (ProductGroup.xp['Master-Group']) {
+                    if (ProductGroup.xp != null && ProductGroup.xp['Master-Group'] !== undefined) {
                         SelectedProduct.xp['Master-Group'] = ProductGroup.xp['Master-Group'];
                         return OrderCloud.Categories.Get(ProductGroup.xp['Master-Group'].ID, 'master-product-groups')
                     } else {
+
                         return {};
                     }
                 },
