@@ -34,8 +34,8 @@
     "View Details": "View Details",
     "Clone": "Clone",
     "Assign": "Assign",
-    "Product Number": "Item Number",
-    "ERP Description": " Navision Description",
+    "Product Number": "SKU",
+    "ERP Description": " ERP Description",
     "Long Description": "Long Description",
     "Status": "Status",
     "Brand Name": "Brand Name",
@@ -53,5 +53,7 @@
     "Payer": "Created For",
     "Create Channel": "Create Distribution",
     "Edit Channel": "Edit Distribution",
-    "Assign Products to Channel": "Assign Products to Distribution"
+    "Assign Products to Channel": "Assign Products to Distribution",
+    "marketing_copy": "Marketing Copy",
+    "basic_attributes": "Basic Attributes"
 }
