@@ -1001,6 +1001,9 @@ function ProductGroupAssignSpecController($scope, OrderCloud, FullOrderCloud, As
     "use strict";
     var vm = this;
 
+
+
+
     vm.groupFilter = $stateParams.group;
 
 
@@ -1021,6 +1024,10 @@ function ProductGroupAssignSpecController($scope, OrderCloud, FullOrderCloud, As
     vm.doTheBack = function() {
         window.history.back();
     };
+
+
+
+    console.log(AssignedSpecs)
 
     vm.productAssignments = ProductAssignments;
     vm.SpecGroups = option_list.spec_groups;

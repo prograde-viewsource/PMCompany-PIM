@@ -19,16 +19,16 @@
             <input type="search" class="form-control" placeholder="Search Products..." ng-model="channelProducts.searchFilter" ng-change="channelProducts.research()" parse-slash />
         </div>
     </div>
-         <div class="col-md-2 form-group">
-             
-            <div class="col-md-1" style="padding: 0px; margin-top:25px;">
-                <div style="position: relative; left: -13px; top: 6px;"><strong>by</strong></div>
-                </div>
-            <div class="col-md-11" style="padding: 0px; margin-top:25px;">
-                <select id="statusFilter" class="form-control"  ng-model="channelProducts.searchby" ng-change="channelProducts.research()">
+    <div class="col-md-2 form-group">
+
+        <div class="col-md-1" style="padding: 0px; margin-top:25px;">
+            <div style="position: relative; left: -13px; top: 6px;"><strong>by</strong></div>
+        </div>
+        <div class="col-md-11" style="padding: 0px; margin-top:25px;">
+            <select id="statusFilter" class="form-control" ng-model="channelProducts.searchby" ng-change="channelProducts.research()">
                     <option ng-repeat="opt in channelProducts.options.search_by" value="{{opt[0]}}">{{opt[1] | i18next}}</option>
                 </select>
-            </div>
+        </div>
     </div>
 </div>
 <div class="row">
@@ -131,7 +131,7 @@
                         </tr>
                     </thead>
                     <tbody dragula="'prod-bag'" dragula-model="channelProducts.assignments.Items" class="oc-table-responsive" id="right-drag-col">
-                        <tr ng-repeat="product in channelProducts.assignments.Items ">
+                        <tr ng-repeat="product in channelProducts.assignments.Items  track by $index ">
                             <td class="text-center tool-td"><i id="handle" class="fa fa-arrows"></i> <i class="fa fa-caret-left" ng-click="channelProducts.pushBack(product)"></i>
                                 <td data-title="ID" class="part-number-td">{{product.ID | slashify}}</td>
                                 <td data-title="Name">{{product.Name | slashify}}</td>
