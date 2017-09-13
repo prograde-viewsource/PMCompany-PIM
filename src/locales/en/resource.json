@@ -55,5 +55,10 @@
     "Edit Channel": "Edit Distribution",
     "Assign Products to Channel": "Assign Products to Distribution",
     "marketing_copy": "Marketing Copy",
-    "basic_attributes": "Basic Attributes"
+    "shipping_specs": "Shipping Specs",
+    "ordering_specs": "ordering Specs",
+    "marketing_copy": "Marketing Copy",
+    "technical_specs": "Technical Specs",
+    "basic_attributes": "Basic Attributes",
+    "media": "Media"
 }
