@@ -14,7 +14,7 @@
         "top": true,
         "bottom": false
     },
-    "protected_fields": [""],
+    "protected_fields": ["ID"],
     "option_list": {
         "spec_groups": ["Basic Attributes", "Marketing Copy", "Media", "Ordering Specs", "Regulation Specs", "Shipping Specs", "Technical Specs", "Pricing"],
         "product_status": [
