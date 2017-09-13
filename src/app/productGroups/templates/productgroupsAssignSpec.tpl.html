@@ -16,7 +16,7 @@
         </select>
     </div>
     <div class="col-md-6">
-        <label>Filter by Search:</label>
+        <label>Filter by Search:</label><em ng-if="productgroupsAssignSpec.searchby == 'xp.Master-Product-Group-XP'" style="opacity:.75; font-size: 11px;  float: right;"> *Use AND, OR and NOT to combine search terms</em>
         <div class="form-group">
             <input type="search" class="form-control" placeholder="Search Product Attributes..." ng-model="productgroupsAssignSpec.searchFilter" ng-change="productgroupsAssignSpec.research()" />
         </div>
@@ -43,7 +43,7 @@
                     <colgroup>
                         <col class="action-column" />
                     </colgroup>
-                    <thead>
+                    <thead ng-if="productgroupsAssignSpec.list.Items.length">
                         <tr>
                             <th></th>
                             <th>
@@ -60,7 +60,7 @@
                             <td data-title="Name"> &nbsp;{{spec.Name | slashify}}</td>
                         </tr>
                         <tr ng-if="!productgroupsAssignSpec.list.Items.length">
-                            <td class="alert alert-info" colspan="2">No matches found.</td>
+                            <td class="alert alert-info" colspan="3">No matches found.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -77,7 +77,7 @@
                     <colgroup>
                         <col class="action-column" />
                     </colgroup>
-                    <thead>
+                    <thead ng-if="productgroupsAssignSpec.assignedSpecs.Items.length">
                         <tr>
                             <th></th>
                             <th>
@@ -93,7 +93,7 @@
                             <td data-title="Name">{{spec.Name | slashify}}</td>
                         </tr>
                         <tr ng-if="!productgroupsAssignSpec.assignedSpecs.Items.length">
-                            <td class="alert alert-info" colspan="2">No matches found.</td>
+                            <td class="alert alert-info" colspan="3">No matches found.</td>
                         </tr>
                     </tbody>
                 </table>

@@ -145,10 +145,11 @@ function CategoriesConfig($stateProvider) {
                         });
 
 
+
                         for (var i = 2, len = _data.Meta.TotalPages; i < len; i++) {
                             if (_data.Items.length < 100 && _data.Meta.TotalCount > 0) {
 
-                                OrderCloud.Products.List(null, i, 100 - _data.Items.length, null, null, { 'catalogID': $stateParams.buyerid }).then(function(_datab) {
+                                OrderCloud.Products.List(null, i, 100, null, null, { 'catalogID': $stateParams.buyerid }).then(function(_datab) {
                                     _datab.Items = _datab.Items.filter(function(current) {
                                         return ProductAssignments.Items.filter(function(current_b) {
                                             return current_b.ID === current.ID;
@@ -163,7 +164,7 @@ function CategoriesConfig($stateProvider) {
                                 });
                             }
                         }
-
+                        /** 
                         var AssignArray = [];
 
                         ProductAssignments.Items.forEach(function(itm) {
@@ -177,8 +178,15 @@ function CategoriesConfig($stateProvider) {
                             }
                         });
                         _data.Meta.TotalCount = t.length > 0 ? _data.Meta.TotalCount : 0;
-                        _data.Items = t;
 
+
+                        
+*/
+
+                        _data.Items = _.uniq(_data.Items, function(item, key, a) {
+                            console.log(item.ID)
+                            return item.ID;
+                        });
                         return _data
                     });
 
@@ -243,7 +251,7 @@ function CategoriesConfig($stateProvider) {
                 Parameters: function($stateParams, OrderCloudParameters) {
                     return OrderCloudParameters.Get($stateParams);
                 },
-                AssignedSpecList: function(OrderCloud, Helpers, SelectedCategory) {
+                AssignedSpecList: function(OrderCloud, Helpers, SelectedCategory, $q) {
 
                     let ids = { "Items": null }
 
@@ -251,27 +259,71 @@ function CategoriesConfig($stateProvider) {
                         ids = SelectedCategory.xp.specAssignments;
                     }
 
-                    let keys = Helpers.getFilterKeys(ids, false);
 
-                    if (keys === undefined) {
-                        keys = "";
+                    if (SelectedCategory.xp.specAssignments.Items !== undefined) {
+                        let keys = Helpers.getFilterKeys(ids, false);
+
+                        if (keys === undefined) {
+                            keys = "";
+                        }
+                        return OrderCloud.Specs.List(null, 1, 100, null, null, { 'ID': keys });
+                    } else {
+
+
+                        var Calls = [];
+                        var rtn = {
+                            Meta: null,
+                            Items: []
+                        };
+                        var uberQ = $q.defer();
+                        var i,
+                            j,
+                            temparray,
+                            chunk = 20;
+
+                        var array = [];
+                        for (var i in SelectedCategory.xp.specAssignments) {
+                            array.push(SelectedCategory.xp.specAssignments[i][0]);
+                        }
+
+                        for (i = 0, j = array.length; i < j; i += chunk) {
+                            temparray = array.slice(i, i + chunk);
+
+                            var id = [];
+                            if (temparray != undefined) {
+                                id = temparray;
+                            }
+
+                            var re = new RegExp(',', 'g');
+                            var keys = id.toString().replace(re, "_pipe_");
+
+                            console.log(keys)
+
+                            if (keys === undefined) {
+                                keys = "";
+                            }
+
+                            Calls.push(OrderCloud.Specs.List(null, 1, 100, null, null, { 'ID': keys }).then(function(response) {
+                                console.log(response);
+                                var conCatArr = rtn.Items.concat(response.Items);
+                                rtn.Items = conCatArr;
+                                rtn.Meta = response.Meta;
+                            }));
+                        }
+
+                        $q.all(Calls).then(function() {
+                            uberQ.resolve(rtn);
+                        });
+
+                        return uberQ.promise;
+
+
+
                     }
-                    return OrderCloud.Specs.List(null, 1, 100, null, null, { 'ID': keys });
                 },
-                FullSpecList: function(OrderCloud, Helpers, SelectedCategory) {
+                FullSpecList: function(FullOrderCloud) {
                     // Negate any slected specs
-                    let ids = { "Items": null }
-
-                    if (SelectedCategory.xp.specAssignments != undefined) {
-                        ids = SelectedCategory.xp.specAssignments;
-                    }
-
-                    let keys = Helpers.getFilterKeys(ids, true);
-
-                    if (keys === undefined) {
-                        keys = "";
-                    }
-                    return OrderCloud.Specs.List(null, 1, 100, null, null, { 'ID': keys });
+                    return FullOrderCloud.Specs.List(null, 1, 100, null, null);
                 },
                 SpecGroups: function(option_list) {
                     var groups = option_list.spec_groups;
@@ -282,7 +334,7 @@ function CategoriesConfig($stateProvider) {
 }
 
 
-function CategoriesController($state, option_list, $ocMedia, OrderCloud, OrderCloudParameters, CategoryList, TrackSearch, Parameters, $timeout, clientsecret, $q, toastr, $http, $rootScope, Buyer, FullOrderCloud, FullProductService, ResourceService, ProductGroups) {
+function CategoriesController($state, $stateParams, option_list, $ocMedia, OrderCloud, OrderCloudParameters, CategoryList, TrackSearch, Parameters, $timeout, clientsecret, $q, toastr, $http, $rootScope, Buyer, FullOrderCloud, FullProductService, ResourceService, ProductGroups) {
     "use strict";
     var vm = this;
     vm.list = CategoryList;
@@ -290,6 +342,26 @@ function CategoriesController($state, option_list, $ocMedia, OrderCloud, OrderCl
     vm.sortSelection = Parameters.sortBy ? (Parameters.sortBy.indexOf('!') === 0 ? Parameters.sortBy.split('!')[1] : Parameters.sortBy) : null;
     vm.selectedBuyer = Buyer;
     vm.options = option_list;
+
+    vm.list.Items.forEach(function(Item) {
+        Item.ProductCount = 0;
+        Item.SpecCount = 0;
+
+        OrderCloud.Products.List(null, 1, 1, null, null, { 'catalogID': $stateParams.buyerid, "categoryid": Item.ID }).then(function(_data) {
+            Item.ProductCount = _data.Meta.TotalCount;
+        });
+
+        try {
+            Item.SpecCount = Item.xp.specAssignments.length;
+
+            if (Item.SpecCount == undefined) {
+                Item.SpecCount = 0;
+            }
+        } catch (e) {
+
+        }
+    })
+
 
     //Check if filters are applied
     vm.filtersApplied = vm.parameters.filters || vm.parameters.from || vm.parameters.to || ($ocMedia('max-width:767px') && vm.sortSelection); //Sort by is a filter on mobile devices
@@ -364,7 +436,7 @@ function CategoriesController($state, option_list, $ocMedia, OrderCloud, OrderCl
         $rootScope.$emit('$stateChangeStart', $state);
         $http({
             method: 'POST',
-            url: 'https://pim-report.azurewebsites.net/CategoryReport?secret=' + clientsecret + '&BuyerID=' + vm.selectedBuyer.ID + '&CategoryID=' + cat.ID + '&vnext=true',
+            url: 'https://pim-report.azurewebsites.net/CategoryReportv2?secret=' + clientsecret + '&BuyerID=' + vm.selectedBuyer.ID + '&CategoryID=' + cat.ID + '&vnext=true',
 
         }).then(function successCallback(response) {
             toastr.success('Distribution Template Ordered', 'Success');
@@ -621,7 +693,7 @@ function CategoryAssignProductController($scope, option_list, $stateParams, $uib
                         }
                     });
 
-                    vm.list.Meta.TotalCount = vm.list.Items.length;
+                    vm.list.Meta.TotalCount = _data.Meta.TotalCount;
                     for (var i = 1, len = _data.Meta.TotalPages; i < len; i++) {
 
                         if (vm.list.Items.length < 100 && _data.Meta.TotalCount > 0) {
@@ -649,19 +721,24 @@ function CategoryAssignProductController($scope, option_list, $stateParams, $uib
             }
 
             if (vm.assignedFilter) {
-                vm.paramObject.catalogID = $stateParams.buyerid;
-                vm.paramObject.categoryid = $stateParams.categoryid;
+                var parms = angular.copy(vm.paramObject)
+                parms.catalogID = $stateParams.buyerid;
+                parms.categoryid = $stateParams.categoryid;
                 vm.prodAssignments.Items = [];
-                OrderCloud.Products.List(keywords, 1, 100, searchby, null, vm.paramObject).then(function(_data) {
+
+                console.log(vm.paramObject)
+                FullOrderCloud.Products.List(null, 1, 100, null, searchby, parms).then(function(_data) {
                     vm.prodAssignments.Meta = _data.Meta;
                     _data.Items.forEach(function(itm) {
                         vm.prodAssignments.Items.push(itm);
                     });
                 });
             } else {
-                OrderCloud.Products.List(null, 1, 100, null, searchby, { 'catalogID': $stateParams.buyerid, "categoryid": $stateParams.categoryid }).then(function(data) {
+                FullOrderCloud.Products.List(null, 1, 100, null, searchby, { 'catalogID': $stateParams.buyerid, "categoryid": $stateParams.categoryid }).then(function(data) {
 
                     vm.prodAssignments = data;
+                    vm.list.Meta.TotalCount = vm.list.Meta.TotalCount + vm.prodAssignments.Items.length;
+
                 });
             }
 
@@ -726,7 +803,7 @@ function CategoryAssignProductController($scope, option_list, $stateParams, $uib
             }
         });
         vm.list.Items.splice(_Index, 1);
-        vm.prodAssignments.Items.unshift(pd);
+        vm.prodAssignments.Items.push(pd);
         vm.prodAssignments.Meta.TotalCount++;
         vm.list.Meta.TotalCount--;
         vm.TotalCount--;
@@ -741,10 +818,10 @@ function CategoryAssignProductController($scope, option_list, $stateParams, $uib
             }
         });
         vm.prodAssignments.Items.splice(_Index, 1);
-        vm.list.Items.unshift(pd);
+        vm.list.Items.push(pd);
 
         vm.prodAssignments.Meta.TotalCount--;
-        vm.list.Meta.TotalCount++;
+        //vm.list.Meta.TotalCount++;
         vm.TotalCount++;
         DeleteFunc(pd.ID);
     };
@@ -771,14 +848,24 @@ function CategoryAssignProductController($scope, option_list, $stateParams, $uib
             paramObject["xp.Status"] = vm.statusFilter;
         }
         if (vm.groupFilter && vm.groupFilter !== '') {
-            paramObject["xp.Product-Group"] = vm.groupFilter;
+            if (vm.groupFilter.toString().includes("MASTER_")) {
+                paramObject["xp.Master-Group.Name"] = vm.groupFilter.replace('MASTER_', '');
+            } else {
+                paramObject["xp.Product-Group"] = vm.groupFilter;
+            }
         }
         if (vm.brandFilter && vm.brandFilter !== '') {
             paramObject["xp.Brand-Name"] = vm.brandFilter;
         }
         paramObject.catalogID = $stateParams.buyerid;
 
-        return Paging.filteredPaging(vm.list, 'Products', vm.searchFilter, paramObject);
+        if (vm.list.Items.length < vm.list.Meta.TotalCount - vm.prodAssignments.Items.length) {
+            return Paging.filteredPaging(vm.list, 'Products', vm.searchFilter, paramObject, vm.prodAssignments);
+
+
+
+
+        }
     }
 
     function RightPagingFunction() {
@@ -787,9 +874,15 @@ function CategoryAssignProductController($scope, option_list, $stateParams, $uib
         if (vm.statusFilter && vm.statusFilter !== '') {
             paramObject["xp.Status"] = vm.statusFilter;
         }
+
         if (vm.groupFilter && vm.groupFilter !== '') {
-            paramObject["xp.Product-Group"] = vm.groupFilter;
+            if (vm.groupFilter.toString().includes("MASTER_")) {
+                paramObject["xp.Master-Group.Name"] = vm.groupFilter.replace('MASTER_', '');
+            } else {
+                paramObject["xp.Product-Group"] = vm.groupFilter;
+            }
         }
+
         if (vm.brandFilter && vm.brandFilter !== '') {
             paramObject["xp.Brand-Name"] = vm.brandFilter;
         }
@@ -1165,11 +1258,13 @@ function CategoryAssignSpecController($scope, toastr, OrderCloud, Paging, FullSp
     // REFACTOR COMPLETE 3/31/17 AG
 
     let _self = this;
-
+    var vNext = false;
     if (SelectedCategory.xp.specAssignments === undefined) {
         SelectedCategory.xp.specAssignments = { "Items": [] }
     }
-
+    if (SelectedCategory.xp.specAssignments.Items === undefined) {
+        vNext = true;
+    }
     _self.assignments = SelectedCategory.xp.specAssignments;
 
     let blankObj = {
@@ -1177,7 +1272,8 @@ function CategoryAssignSpecController($scope, toastr, OrderCloud, Paging, FullSp
         "Name": "Blank Column",
         "xp": {
             "Group": SpecGroups[0],
-            "Base": true
+            "Base": true,
+            "CustomLabels": {}
         }
     };
 
@@ -1249,16 +1345,52 @@ function CategoryAssignSpecController($scope, toastr, OrderCloud, Paging, FullSp
         }
     };
 
+    let ids = "";
 
-    let ids = Helpers.getFilterKeys(SelectedCategory.xp.specAssignments, false, 'ID', '^');
-    ids = "|" + ids;
+    if (!vNext) {
+        ids = Helpers.getFilterKeys(SelectedCategory.xp.specAssignments, false, 'ID', '^');
+        ids = "|" + ids;
+    } else {
+
+        var array = [];
+        for (var i in SelectedCategory.xp.specAssignments) {
+            array.push(SelectedCategory.xp.specAssignments[i][0]);
+        }
+
+        var re = new RegExp(',', 'g');
+        var keys = array.toString().replace(re, "|");
+        ids = "|" + keys + "|";;
+    }
+
+
+
+    var idxToRemove = [];
+    FullSpecList.Items.forEach(function(cat, idx) {
+        if (ids.indexOf(cat.ID) !== -1) {
+            idxToRemove.push(idx);
+        }
+    });
+
+    idxToRemove.sort(function(a, b) {
+        return b - a;
+    });
+
+    idxToRemove.forEach(function(idx) {
+        FullSpecList.Items.splice(idx, 1);
+    });
+
+    FullSpecList.Meta.TotalCount = FullSpecList.Items.length;
+
     let ids2 = Helpers.getFilterKeys(FullSpecList, false, 'ID', '^');
     ids2 = "|" + ids2;
-
-    if (ids2.indexOf('_blank') == -1) {
+    console.log(ids2)
+    if (ids2.indexOf('_blank') === -1) {
         FullSpecList.Items.unshift(blankObj);
         FullSpecList.Meta.TotalCount++;
     }
+
+
+
 
     let statics = new Map(static_template_headers_map);
     for (let [key, value] of statics) {
@@ -1272,41 +1404,87 @@ function CategoryAssignSpecController($scope, toastr, OrderCloud, Paging, FullSp
         };
         if (ids.indexOf("|" + key + "|") > -1) {
             var hasStaticAdded = false;
-            AssignedSpecList.Items.forEach(function(stat) {
-                if (stat.ID == key)
-                    hasStaticAdded = true;
-            });
+            try {
+                AssignedSpecList.Items.forEach(function(stat) {
+                    if (stat.ID == key)
+                        hasStaticAdded = true;
+                });
+            } catch (e) {}
             if (!hasStaticAdded)
+
                 AssignedSpecList.Items.push(staticObj);
-        } else if (ids2.indexOf(key) == -1) {
+        } else {
+
             FullSpecList.Items.unshift(staticObj);
             FullSpecList.Meta.TotalCount++;
         }
     }
+
+
+
     // add Order In
-    for (let xpItem of SelectedCategory.xp.specAssignments.Items) {
-        for (let item of AssignedSpecList.Items) {
-            if (xpItem.ID === item.ID) {
-                item.ListOrder = xpItem.ListOrder;
+    if (!vNext) {
+        for (let xpItem of SelectedCategory.xp.specAssignments.Items) {
+            for (let item of AssignedSpecList.Items) {
+                if (xpItem[0] === item.ID) {
+                    item.ListOrder = xpItem[1];
+                }
+            }
+        }
+
+        AssignedSpecList.Items.forEach(function(itm, idx) {
+            if (itm.ID === "_blank") {
+                AssignedSpecList.Items.splice(idx, 1);
+            }
+        });
+
+        // Add Blanks
+        for (let xpItem of SelectedCategory.xp.specAssignments.Items) {
+            if (xpItem[0] === "_blank") {
+                var blank = angular.copy(blankObj);
+                blank.ListOrder = xpItem.ListOrder;
+                //try { blank.Base.CustomLabels = xpItem.Base.CustomLabels; } catch (e) {}
+                AssignedSpecList.Items.push(blank);
+            }
+        }
+    } else {
+
+        for (let xpItem of SelectedCategory.xp.specAssignments) {
+            for (let item of AssignedSpecList.Items) {
+                if (xpItem[0] === item.ID) {
+                    item.ListOrder = xpItem[1];
+                }
+            }
+        }
+
+        AssignedSpecList.Items.forEach(function(itm, idx) {
+            if (itm.ID === "_blank") {
+                AssignedSpecList.Items.splice(idx, 1);
+            }
+        });
+
+        // Add Blanks
+        for (let xpItem of SelectedCategory.xp.specAssignments) {
+            if (xpItem[0] === "_blank") {
+                console.log(xpItem)
+                var blank = angular.copy(blankObj);
+                blank.ListOrder = xpItem[1];
+
+                try {
+                    blank.xp.CustomLabels[Buyer.ID] = {
+                        "Name": Buyer.Name,
+                        "Label": xpItem[3],
+                        "ID": Buyer.ID
+                    }
+
+                } catch (e) {
+                    console.log(e)
+
+                }
+                AssignedSpecList.Items.push(blank);
             }
         }
     }
-
-    AssignedSpecList.Items.forEach(function(itm, idx) {
-        if (itm.ID === "_blank") {
-            AssignedSpecList.Items.splice(idx, 1);
-        }
-    });
-    // Add Blanks
-    for (let xpItem of SelectedCategory.xp.specAssignments.Items) {
-        if (xpItem.ID === "_blank") {
-            var blank = angular.copy(blankObj);
-            blank.ListOrder = xpItem.ListOrder;
-            try { blank.Base.CustomLabels = xpItem.Base.CustomLabels; } catch (e) {}
-            AssignedSpecList.Items.push(blank);
-        }
-    }
-
 
     AssignedSpecList.Items = _.sortBy(AssignedSpecList.Items, function(o) { return o.ListOrder; });
 
@@ -1321,7 +1499,7 @@ function CategoryAssignSpecController($scope, toastr, OrderCloud, Paging, FullSp
         $rootScope.$emit('$stateChangeStart', $state);
         $http({
             method: 'POST',
-            url: 'https://pim-report.azurewebsites.net/CategoryReport?secret=' + clientsecret + '&BuyerID=' + Buyer.ID + '&CategoryID=' + _self.Category.ID,
+            url: 'https://pim-report.azurewebsites.net/CategoryReportv2?secret=' + clientsecret + '&BuyerID=' + Buyer.ID + '&CategoryID=' + _self.Category.ID + '&vnext=true',
 
         }).then(function successCallback(response) {
             toastr.success('Distribution Template Ordered', 'Success');
@@ -1347,17 +1525,31 @@ function CategoryAssignSpecController($scope, toastr, OrderCloud, Paging, FullSp
     }
     let SaveAssignment = _.debounce(() => {
         // Clean the specs out before adding new ones
-        SelectedCategory.xp.specAssignments = { 'Items': [] };
+        SelectedCategory.xp.specAssignments = [];
         for (let [i, item] of _self.assignments.Items.entries()) {
             item.ListOrder = i + 1;
             delete item.xp.Description;
-
             delete item.xp.isMediaAttribute;
-            let spec = { 'ID': item.ID, "ListOrder": item.ListOrder, "Name": item.Name, "Base": item.xp };
-            if (item.xp.BaseLevel) {
-                spec.BaseLevel = true;
+            delete item.xp.options;
+            let spec = [item.ID, item.ListOrder];
+
+
+            if (item.xp.Base) {
+                spec.push(item.Name);
+
+
+
+                if (item.xp["CustomLabels"]) {
+                    if (item.xp.CustomLabels[Buyer.ID]) {
+                        spec.push(item.xp.CustomLabels[Buyer.ID].Label);
+                    }
+                }
+
+
             }
-            SelectedCategory.xp.specAssignments.Items.push(spec);
+
+
+            SelectedCategory.xp.specAssignments.push(spec);
         }
 
         OrderCloud.Categories.Update(_self.Category.ID, SelectedCategory, _self.buyer.DefaultCatalogID)
@@ -1373,20 +1565,25 @@ function CategoryAssignSpecController($scope, toastr, OrderCloud, Paging, FullSp
                 if (id !== '_blank') {
                     _self.list.Items.splice(i, 1);
                 }
-                _self.assignments.Items.unshift(item);
+                _self.assignments.Items.push(item);
                 SaveAssignment();
             }
         }
     };
 
     let PushBack = (id) => {
+
+        var moved = false;
         for (let [i, item] of _self.assignments.Items.entries()) {
-            if (item.ID === id) {
+
+            if (item.ID === id && !moved) {
+                moved = true;
                 if (id !== "_blank") {
-                    _self.list.Items.unshift(item);
+                    _self.list.Items.push(item);
                 }
                 _self.assignments.Items.splice(i, 1);
                 SaveAssignment();
+
             }
         }
     };
@@ -1409,11 +1606,14 @@ function CategoryAssignSpecController($scope, toastr, OrderCloud, Paging, FullSp
 
     let UpdateSpec = (spec) => {
         spec.editMode = false;
-        OrderCloud.Specs.Update(spec.ID, spec);
+        if (!spec.xp["Base"]) {
+            OrderCloud.Specs.Update(spec.ID, spec);
+        }
         SaveAssignment();
     };
 
     let addCustomLabel = (spec) => {
+
         if (spec.xp.CustomLabels === undefined) {
             spec.xp.CustomLabels = {}
         }
@@ -1430,7 +1630,9 @@ function CategoryAssignSpecController($scope, toastr, OrderCloud, Paging, FullSp
             if (result) {
                 spec.editMode = false;
                 delete spec.xp.CustomLabels[Buyer.ID];
-                OrderCloud.Specs.Update(spec.ID, spec);
+                if (!spec.xp["Base"]) {
+                    OrderCloud.Specs.Update(spec.ID, spec);
+                }
             }
             SaveAssignment();
 

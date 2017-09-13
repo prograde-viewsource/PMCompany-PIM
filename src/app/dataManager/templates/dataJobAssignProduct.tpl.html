@@ -1,5 +1,5 @@
 <h3 class="page-header">
-    <b>Assign Products to Data Job:</b> {{DataJobAssignProd.Category.Name}}
+    <b>Assign Products to Data Template:</b> {{DataJobAssignProd.Category.Name}}
 </h3>
 <div class="row">
     <div class="form-group edit-button-group">
@@ -14,7 +14,7 @@
         </select>
     </div>
     <div class="col-md-4">
-        <label>Filter by Search:</label>
+        <label>Filter by Search:</label><em ng-if="DataJobAssignProd.searchby == 'xp.Master-Product-Group-XP'" style="opacity:.75; font-size: 11px;  float: right;"> *Use AND, OR and NOT to combine search terms</em>
         <div class="form-group">
             <input type="search" class="form-control" placeholder="Search Products..." ng-model="DataJobAssignProd.searchFilter" ng-change="DataJobAssignProd.research()" parse-slash />
         </div>
@@ -60,7 +60,7 @@
 </div>
 <div class="row">
     <div class="col-xs-6">
-        <div class='scroll-count'>Showing <strong>{{DataJobAssignProd.list.Items.length}}</strong> of <strong>{{DataJobAssignProd.list.Items.length > 0 ? DataJobAssignProd.list.Meta.TotalCount : 0}}</strong></div>
+        <div class='scroll-count'>Showing <strong>{{DataJobAssignProd.list.Items.length}}</strong> of <strong>{{DataJobAssignProd.list.Items.length -DataJobAssignProd.prodAssignments.Items.length > 0 ? DataJobAssignProd.list.Meta.TotalCount -DataJobAssignProd.prodAssignments.Items.length : 0}}</strong></div>
         <section class="table-fixed-header no-margin">
 
             <div class="table-header-bg"></div>
@@ -69,7 +69,7 @@
                     <colgroup>
                         <col class="action-column" />
                     </colgroup>
-                    <thead>
+                    <thead ng-if="DataJobAssignProd.list.Items.length">
                         <tr>
                             <th class="tool-th">
                                 <div class="tool-div">
@@ -101,7 +101,7 @@
         </section>
     </div>
     <div class="col-xs-6">
-        <div class='scroll-count'>Showing <strong>{{DataJobAssignProd.prodAssignments.Items.length}}</strong> of <strong>{{DataJobAssignProd.prodAssignments.Meta.TotalCount}}</strong></div>
+        <div class='scroll-count'>Showing <strong>{{DataJobAssignProd.prodAssignments.Items.length}}</strong> of <strong>{{DataJobAssignProd.prodAssignments.Items.length}}</strong></div>
         <section class="table-fixed-header no-margin">
             <div class="table-header-bg"></div>
             <div class="table-container" servicename="Specs" controlleras="DataJobAssignProd" idname="SpecID" disable-dynamic-validation ng-style="DataJobAssignProd.leftDragColMaxheight">
@@ -109,7 +109,7 @@
                     <colgroup>
                         <col class="action-column" />
                     </colgroup>
-                    <thead>
+                    <thead ng-if="DataJobAssignProd.prodAssignments.Items.length">
                         <tr>
                             <th class="tool-th">
                                 <div class="tool-div">

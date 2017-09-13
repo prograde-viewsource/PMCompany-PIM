@@ -5,13 +5,8 @@ angular.module('productManager')
     .controller('ProductGroupEditCtrl', ProductGroupEditController)
     .controller('ProductGroupCreateCtrl', ProductGroupCreateController)
     .controller('ProductGroupCloneCtrl', ProductGroupCloneController)
-    .controller('ProductGroupTreeCtrl', ProductGroupTreeController)
-    .controller('ProductGroupAssignPartyCtrl', ProductGroupAssignPartyController)
     .controller('ProductGroupAssignProductCtrl', ProductGroupAssignProductController)
     .controller('ProductGroupAssignSpecCtrl', ProductGroupAssignSpecController)
-    .factory('ProductGroupTreeService', ProductGroupTreeService)
-    .directive('productGroupNode', ProductGroupNode)
-    .directive('productGroupTree', ProductGroupTree)
     .controller('SelectDialogCtrl', SelectDialogController)
     .controller('DeselectDialogCtrl', DeselectDialogController);
 
@@ -32,258 +27,233 @@ function ProductGroupConfig($stateProvider) {
                 Parameters: function($stateParams, OrderCloudParameters) {
                     return OrderCloudParameters.Get($stateParams);
                 },
-                CategoryList: function(OrderCloud, Parameters, $stateParams) {
+                CategoryList: function(OrderCloud, Parameters) {
                     var parameters = angular.copy(Parameters);
                     parameters.depth = 'all';
                     return OrderCloud.Categories.List(parameters.search, Parameters.page, 100, null, parameters.sortBy, null, 'all', null);
                 }
             }
         })
-        .state('productgroups.tree', {
-            url: '/tree',
-            templateUrl: 'productGroups/templates/productgroupsTree.tpl.html',
-            controller: 'ProductGroupTreeCtrl',
-            controllerAs: 'productgroupsTree',
-            resolve: {
-                Tree: function(CategoryTreeService) {
-                    return CategoryTreeService.GetCategoryTree();
-                }
-            }
-        })
-        .state('productgroups.edit', {
-            url: '/:categoryid/edit',
-            templateUrl: 'productGroups/templates/productgroupsEdit.tpl.html',
-            controller: 'ProductGroupEditCtrl',
-            controllerAs: 'productgroupsEdit',
-            resolve: {
-                SelectedCategory: function($stateParams, $state, OrderCloud) {
-                    return OrderCloud.Categories.Get($stateParams.categoryid).catch(function() {
-                        $state.go('^.productgroups');
-                    });
-                },
-                MasterCategoryList: function(OrderCloud, Parameters) {
-                    var parameters = angular.copy(Parameters);
-                    parameters.depth = 'all';
-                    return OrderCloud.Categories.List(null, parameters.page, parameters.pageSize || 50, null, parameters.sortBy, parameters.filters, parameters.depth, 'master-product-groups');
-                }
-            }
-        })
-        .state('productgroups.create', {
-            url: '/create',
-            templateUrl: 'productGroups/templates/productgroupsCreate.tpl.html',
-            controller: 'ProductGroupCreateCtrl',
-            controllerAs: 'productgroupsCreate',
-            resolve: {
-                MasterCategoryList: function(OrderCloud, Parameters) {
-                    var parameters = angular.copy(Parameters);
-                    parameters.depth = 'all';
-                    return OrderCloud.Categories.List(null, parameters.page, parameters.pageSize || 50, null, parameters.sortBy, parameters.filters, parameters.depth, 'master-product-groups');
-                }
-            }
-        })
-        .state('productgroups.clone', {
-            url: '/:categoryid/clone',
-            templateUrl: 'productGroups/templates/productgroupsClone.tpl.html',
-            controller: 'ProductGroupCloneCtrl',
-            controllerAs: 'productgroupsClone',
-            resolve: {
-                SelectedCategory: function($stateParams, $state, OrderCloud) {
-                    return OrderCloud.Categories.Get($stateParams.categoryid).catch(function() {
-                        $state.go('^.productgroups');
-                    });
-                }
-            }
-        })
-        .state('productgroups.assignParty', {
-            url: '/:categoryid/assign/party',
-            templateUrl: 'productGroups/templates/productgroupsAssignParty.tpl.html',
-            controller: 'ProductGroupAssignPartyCtrl',
-            controllerAs: 'productgroupsAssignParty',
-            resolve: {
-                UserGroupList: function(OrderCloud) {
-                    return OrderCloud.UserGroups.List();
-                },
-                AssignedUserGroups: function($stateParams, OrderCloud) {
-                    return OrderCloud.Categories.ListAssignments($stateParams.categoryid);
-                },
-                SelectedCategory: function($stateParams, $state, OrderCloud) {
-                    return OrderCloud.Categories.Get($stateParams.categoryid).catch(function() {
-                        $state.go('^.productgroups');
-                    });
-                }
-            }
-        })
-        .state('productgroups.assignProduct', {
-            url: '/:categoryid/assign/product',
-            templateUrl: 'productGroups/templates/productgroupsAssignProduct.tpl.html',
-            controller: 'ProductGroupAssignProductCtrl',
-            controllerAs: 'productgroupsAssignProd',
 
-            resolve: {
-                ProductList: function(FullOrderCloud, ProductAssignments, OrderCloud) {
-                    console.log(ProductAssignments)
-                    return FullOrderCloud.Products.List(null, 1, 100, null, null, null).then(function(data) {
-                        var _data = data;
-                        _data.Items = _data.Items.filter(function(current) {
-                            return ProductAssignments.Items.filter(function(current_b) {
-                                return current_b.ID === current.ID;
-                            }).length === 0;
-                        });
-                        return _data;
-                    });
-                },
-                ProductAssignments: function($stateParams, OrderCloud, FullOrderCloud, $q) {
-                    return FullOrderCloud.Categories.ListProductAssignments($stateParams.categoryid).then(
-                        function(data) {
-                            var Calls = [];
-                            var rtn = {
-                                Meta: null,
-                                Items: []
-                            };
-                            var uberQ = $q.defer();
-                            var i, j, temparray, chunk = 20;
-
-                            var array = [];
-                            for (var i in data.Items) {
-
-                                array.push(data.Items[i].ProductID);
-                            }
-
-                            for (i = 0, j = array.length; i < j; i += chunk) {
-                                temparray = array.slice(i, i + chunk);
-
-                                let ids = {
-                                    "Items": null
-                                }
-                                if (temparray != undefined) {
-                                    ids = temparray;
-                                }
-
-                                var re = new RegExp(',', 'g');
-                                let keys = ids.toString().replace(re, "_pipe_");
-
-                                if (keys === undefined) {
-                                    keys = "";
-                                }
-
-                                Calls.push(OrderCloud.Products.List(null, 1, 100, null, null, {
-                                    'ID': keys
-                                }).then(function(response) {
-                                    var conCatArr = rtn.Items.concat(response.Items);
-                                    rtn.Items = conCatArr;
-                                    rtn.Meta = response.Meta;
-                                }));
-                            }
-
-                            $q.all(Calls).then(function() {
-                                uberQ.resolve(rtn);
-                            });
-
-                            return uberQ.promise;
-                        });
-                },
-                Assignments: function($stateParams, FullOrderCloud) {
-                    return FullOrderCloud.Categories.ListProductAssignments($stateParams.categoryid);
-                },
-                SelectedCategory: function($stateParams, $state, OrderCloud) {
-                    return OrderCloud.Categories.Get($stateParams.categoryid).catch(function() {
-                        $state.go('^.productgroups');
-                    });
-                }
-            }
-        })
-        .state('productgroups.assignSpec', {
-            url: '/:categoryid/assign/spec',
-            templateUrl: 'productGroups/templates/productgroupsAssignSpec.tpl.html',
-            controller: 'ProductGroupAssignSpecCtrl',
-            controllerAs: 'productgroupsAssignSpec',
-            params: {
-                group: null
+    .state('productgroups.edit', {
+        url: '/:categoryid/edit',
+        templateUrl: 'productGroups/templates/productgroupsEdit.tpl.html',
+        controller: 'ProductGroupEditCtrl',
+        controllerAs: 'productgroupsEdit',
+        resolve: {
+            SelectedCategory: function($stateParams, $state, OrderCloud) {
+                return OrderCloud.Categories.Get($stateParams.categoryid).catch(function() {
+                    $state.go('^.productgroups');
+                });
             },
-            resolve: {
-                AssignedSpecs: function($stateParams, OrderCloud, FullOrderCloud, $q) {
-                    return OrderCloud.Categories.Get($stateParams.categoryid).then(
-                        function(data) {
-                            var IDs = "";
-
-                            if (data.xp == null) {
-                                data.xp = {};
-                                data.xp.specAssignments = [];
-                            }
-
-                            var specCalls = [];
-                            var specs = {
-                                Meta: null,
-                                Items: []
-                            };
-                            var uberQ = $q.defer();
-                            var i, j, temparray, chunk = 20;
-
-                            var array = [];
-                            for (var i in data.xp.specAssignments) {
-                                array.push(i);
-                            }
-
-                            for (i = 0, j = array.length; i < j; i += chunk) {
-                                temparray = array.slice(i, i + chunk);
-
-                                let ids = {
-                                    "Items": null
-                                }
-                                if (temparray != undefined) {
-                                    ids = temparray;
-                                }
-
-                                var re = new RegExp(',', 'g');
-                                let keys = ids.toString().replace(re, "_pipe_");
-
-                                if (keys === undefined) {
-                                    keys = "";
-                                }
-
-                                specCalls.push(OrderCloud.Specs.List(null, 1, 100, null, null, {
-                                    'ID': keys
-                                }).then(function(response) {
-                                    var conCatArr = specs.Items.concat(response.Items);
-                                    specs.Items = conCatArr;
-                                    specs.Meta = response.Meta;
-                                }));
-                            }
-
-                            $q.all(specCalls).then(function() {
-                                uberQ.resolve(specs);
-                            });
-
-                            return uberQ.promise;
-
-                        });
-                },
-                FullSpecList: function(FullOrderCloud, AssignedSpecs, $q) {
-                    return FullOrderCloud.Specs.List(null, 1, 100, null, null, null).then(function(data) {
-                        var _data = data;
-                        _data.Items = _data.Items.filter(function(current) {
-                            return AssignedSpecs.Items.filter(function(current_b) {
-                                return current_b.ID === current.ID;
-                            }).length === 0;
-                        });
-
-                        return _data;
-                    });
-                },
-                SpecGroups: function(option_list) {
-
-                    return option_list.spec_groups;
-                },
-                ProductAssignments: function($stateParams, FullOrderCloud) {
-                    return FullOrderCloud.Categories.ListProductAssignments($stateParams.categoryid);
-                },
-                SelectedCategory: function($stateParams, $state, OrderCloud) {
-                    return OrderCloud.Categories.Get($stateParams.categoryid).catch(function() {
-                        $state.go('^.productgroups');
-                    });
-                }
+            MasterCategoryList: function(OrderCloud, Parameters) {
+                var parameters = angular.copy(Parameters);
+                parameters.depth = 'all';
+                return OrderCloud.Categories.List(null, parameters.page, parameters.pageSize || 50, null, parameters.sortBy, parameters.filters, parameters.depth, 'master-product-groups');
             }
-        });
+        }
+    })
+
+    .state('productgroups.create', {
+        url: '/create',
+        templateUrl: 'productGroups/templates/productgroupsCreate.tpl.html',
+        controller: 'ProductGroupCreateCtrl',
+        controllerAs: 'productgroupsCreate',
+        resolve: {
+            MasterCategoryList: function(OrderCloud, Parameters) {
+                var parameters = angular.copy(Parameters);
+                parameters.depth = 'all';
+                return OrderCloud.Categories.List(null, parameters.page, parameters.pageSize || 50, null, parameters.sortBy, parameters.filters, parameters.depth, 'master-product-groups');
+            }
+        }
+    })
+
+    .state('productgroups.clone', {
+        url: '/:categoryid/clone',
+        templateUrl: 'productGroups/templates/productgroupsClone.tpl.html',
+        controller: 'ProductGroupCloneCtrl',
+        controllerAs: 'productgroupsClone',
+        resolve: {
+            SelectedCategory: function($stateParams, $state, OrderCloud) {
+                return OrderCloud.Categories.Get($stateParams.categoryid).catch(function() {
+                    $state.go('^.productgroups');
+                });
+            }
+        }
+    })
+
+    .state('productgroups.assignProduct', {
+        url: '/:categoryid/assign/product',
+        templateUrl: 'productGroups/templates/productgroupsAssignProduct.tpl.html',
+        controller: 'ProductGroupAssignProductCtrl',
+        controllerAs: 'productgroupsAssignProd',
+        resolve: {
+            ProductList: function(OrderCloud, ProductAssignments) {
+                return OrderCloud.Products.List(null, 1, 100, null, null, null).then(function(data) {
+                    var _data = data;
+                    _data.Items = _data.Items.filter(function(current) {
+                        return ProductAssignments.Items.filter(function(current_b) {
+                            return current_b.ID === current.ID;
+                        }).length === 0;
+                    });
+                    return _data;
+                });
+            },
+            ProductAssignments: function($stateParams, OrderCloud, FullOrderCloud, $q) {
+                return FullOrderCloud.Categories.ListProductAssignments($stateParams.categoryid).then(
+                    function(data) {
+                        var Calls = [];
+                        var rtn = {
+                            Meta: null,
+                            Items: []
+                        };
+                        var uberQ = $q.defer();
+                        var i, j, temparray, chunk = 20;
+
+                        var array = [];
+                        for (var i in data.Items) {
+
+                            array.push(data.Items[i].ProductID);
+                        }
+
+                        for (i = 0, j = array.length; i < j; i += chunk) {
+                            temparray = array.slice(i, i + chunk);
+
+                            let ids = {
+                                "Items": null
+                            }
+                            if (temparray != undefined) {
+                                ids = temparray;
+                            }
+
+                            var re = new RegExp(',', 'g');
+                            let keys = ids.toString().replace(re, "_pipe_");
+
+                            if (keys === undefined) {
+                                keys = "";
+                            }
+
+                            Calls.push(OrderCloud.Products.List(null, 1, 100, null, null, {
+                                'ID': keys
+                            }).then(function(response) {
+                                var conCatArr = rtn.Items.concat(response.Items);
+                                rtn.Items = conCatArr;
+                                rtn.Meta = response.Meta;
+                            }));
+                        }
+
+                        $q.all(Calls).then(function() {
+                            uberQ.resolve(rtn);
+                        });
+
+                        return uberQ.promise;
+                    });
+            },
+            Assignments: function($stateParams, FullOrderCloud) {
+                return FullOrderCloud.Categories.ListProductAssignments($stateParams.categoryid);
+            },
+            SelectedCategory: function($stateParams, $state, OrderCloud) {
+                return OrderCloud.Categories.Get($stateParams.categoryid).catch(function() {
+                    $state.go('^.productgroups');
+                });
+            }
+        }
+    })
+
+    .state('productgroups.assignSpec', {
+        url: '/:categoryid/assign/spec',
+        templateUrl: 'productGroups/templates/productgroupsAssignSpec.tpl.html',
+        controller: 'ProductGroupAssignSpecCtrl',
+        controllerAs: 'productgroupsAssignSpec',
+        params: {
+            group: null
+        },
+        resolve: {
+            AssignedSpecs: function($stateParams, OrderCloud, FullOrderCloud, $q) {
+                return OrderCloud.Categories.Get($stateParams.categoryid).then(
+
+                    function(data) {
+                        var IDs = "";
+
+                        if (data.xp == null) {
+                            data.xp = {};
+                            data.xp.specAssignments = [];
+                        }
+
+                        var specCalls = [];
+                        var specs = {
+                            Meta: null,
+                            Items: []
+                        };
+                        var uberQ = $q.defer();
+                        var i, j, temparray, chunk = 20;
+
+                        var array = [];
+                        for (var i in data.xp.specAssignments) {
+                            array.push(i);
+                        }
+
+                        var arraySplit = Math.ceil(array.length / chunk);
+
+                        for (i = 0, j = arraySplit; i <= j; i++) {
+                            temparray = array.slice((((i + 1) * chunk) - chunk), (i + 1) * chunk);
+
+                            let ids = {
+                                "Items": null
+                            }
+                            if (temparray !== undefined) {
+                                ids = temparray;
+                            }
+
+                            var re = new RegExp(',', 'g');
+                            let keys = ids.toString().replace(re, "_pipe_");
+
+                            if (keys === undefined) {
+                                keys = "";
+                            }
+
+                            specCalls.push(OrderCloud.Specs.List(null, 1, 100, null, null, {
+                                'ID': keys
+                            }).then(function(response) {
+                                var conCatArr = specs.Items.concat(response.Items);
+                                specs.Items = conCatArr;
+                                specs.Meta = response.Meta;
+                            }));
+                        }
+
+                        $q.all(specCalls).then(function() {
+                            uberQ.resolve(specs);
+                        });
+
+                        return uberQ.promise;
+                    });
+            },
+            FullSpecList: function(FullOrderCloud, AssignedSpecs, $q) {
+                return FullOrderCloud.Specs.List(null, 1, 100, null, null, null).then(function(data) {
+                    var _data = data;
+                    _data.Items = _data.Items.filter(function(current) {
+                        return AssignedSpecs.Items.filter(function(current_b) {
+                            return current_b.ID === current.ID;
+                        }).length === 0;
+                    });
+
+                    return _data;
+                });
+            },
+            SpecGroups: function(option_list) {
+
+                return option_list.spec_groups;
+            },
+            ProductAssignments: function($stateParams, FullOrderCloud) {
+                return FullOrderCloud.Categories.ListProductAssignments($stateParams.categoryid);
+            },
+            SelectedCategory: function($stateParams, $state, OrderCloud) {
+                return OrderCloud.Categories.Get($stateParams.categoryid).catch(function() {
+                    $state.go('^.productgroups');
+                });
+            }
+        }
+    });
 }
 
 //  Confirm Password Controller
@@ -299,7 +269,7 @@ function SelectDialogController($scope, $uibModalInstance, Audit, $i18next, toas
             Audit.log($i18next.t("Channel Product Assignment"), product.Name + " > " + Scope.buyer.Name, [{ "Type": "Channel", "TargetID": Scope.buyer.ID, "NewState": product.ID }], 'CREATE');
         });
         Scope.assignments.Meta = Scope.list.Data;
-        Scope.assignments.Items.unshift.apply(Scope.assignments.Items, Scope.list.Items);
+        Scope.assignments.Items.push.apply(Scope.assignments.Items, Scope.list.Items);
         Scope.list.Items = [];
         $uibModalInstance.close();
     };
@@ -309,7 +279,7 @@ function SelectDialogController($scope, $uibModalInstance, Audit, $i18next, toas
         Scope.application.apiAgentService.assignProducts(Scope.buyer.ID, Scope.paramObject, Scope.searchFilter);
         Scope.assignments.Meta = angular.copy(Scope.list.Meta);
         Scope.list.Meta.TotalCount = 0;
-        Scope.assignments.Items.unshift.apply(Scope.assignments.Items, Scope.list.Items);
+        Scope.assignments.Items.push.apply(Scope.assignments.Items, Scope.list.Items);
         Scope.list.Items = [];
         $uibModalInstance.close();
     };
@@ -330,7 +300,7 @@ function DeselectDialogController($scope, $uibModalInstance, Audit, $i18next, to
             Audit.log($i18next.t("Channel Product Assignment"), product.Name + " > " + Scope.buyer.Name, [{ "Type": "Channel", "TargetID": Scope.buyer.ID, "NewState": product.ID }], 'DELETE');
         });
         Scope.AssignArray = [];
-        Scope.list.Items.unshift.apply(Scope.list.Items, Scope.assignments.Items);
+        Scope.list.Items.push.apply(Scope.list.Items, Scope.assignments.Items);
         Scope.assignments.Items = [];
         Scope.list.Meta.ItemRange[1] = Scope.list.Items.length;
         Scope.assignments.Meta.ItemRange[1] = 0;
@@ -342,7 +312,6 @@ function DeselectDialogController($scope, $uibModalInstance, Audit, $i18next, to
         $uibModalInstance.close();
     };
 }
-
 
 function ProductGroupController($state, $ocMedia, OrderCloud, OrderCloudParameters, CategoryList, TrackSearch, Parameters, $q, toastr, $http, $rootScope) {
     "use strict";
@@ -513,7 +482,7 @@ function ProductGroupEditController($exceptionHandler, $state, FullOrderCloud, O
                     });
                     OrderCloud.Categories.Update(og.ID, og, 'master-product-groups').then(function() {
                         OrderCloud.Categories.Get(vm.SelectedGroup, 'master-product-groups').then(function(og) {
-                            og.xp.ProductGroups.unshift({
+                            og.xp.ProductGroups.push({
                                 ID: vm.category.ID,
                                 Name: vm.category.Name
                             });
@@ -684,60 +653,6 @@ function ProductGroupCloneController($exceptionHandler, $state, OrderCloud, Sele
     };
 }
 
-function ProductGroupTreeController(Tree, CategoryTreeService) {
-    "use strict";
-    var vm = this;
-    vm.tree = Tree;
-
-    vm.treeOptions = {
-        dropped: function(event) {
-            CategoryTreeService.UpdateCategoryNode(event);
-        }
-    };
-}
-
-function ProductGroupAssignPartyController($scope, OrderCloud, Assignments, Paging, UserGroupList, AssignedUserGroups, SelectedCategory, toastr) {
-    "use strict";
-    var vm = this;
-    vm.Category = SelectedCategory;
-    vm.list = UserGroupList;
-    vm.assignments = AssignedUserGroups;
-    vm.saveAssignments = SaveAssignment;
-    vm.pagingfunction = PagingFunction;
-
-    $scope.$watchCollection(function() {
-        return vm.list;
-    }, function() {
-        Paging.setSelected(vm.list.Items, vm.assignments.Items, 'UserGroupID');
-    });
-
-    function SaveFunc(ItemID) {
-
-        return OrderCloud.Categories.SaveAssignment({
-            UserID: null,
-            UserGroupID: ItemID,
-            CategoryID: vm.Category.ID
-        });
-    }
-
-    function DeleteFunc(ItemID) {
-        return OrderCloud.Categories.DeleteAssignment(vm.Category.ID, null, ItemID);
-    }
-
-    function SaveAssignment() {
-        toastr.success('Assignment Updated', 'Success');
-        return Assignments.saveAssignments(vm.list.Items, vm.assignments.Items, SaveFunc, DeleteFunc);
-    }
-
-    function AssignmentFunc() {
-        return OrderCloud.Categories.ListAssignments(vm.Category.ID, null, vm.assignments.Meta.PageSize);
-    }
-
-    function PagingFunction() {
-        return Paging.paging(vm.list, 'UserGroups', vm.assignments, AssignmentFunc);
-    }
-}
-
 function ProductGroupAssignProductController($scope, OrderCloud, FullOrderCloud, $uibModal, Assignments, Paging, ProductList, ProductAssignments, SelectedCategory, toastr, $timeout, dragulaService, $state, $stateParams, Audit, option_list) {
     "use strict";
     var vm = this;
@@ -749,7 +664,39 @@ function ProductGroupAssignProductController($scope, OrderCloud, FullOrderCloud,
     vm.options = option_list;
     var searching;
 
-    console.log(Assignments);
+
+    vm.prodAssignments.Items.forEach(function(item) {
+        //SaveFuncDrew(item.ID);
+    })
+
+
+
+    function SaveFuncDrew(ItemID) {
+        return OrderCloud.Categories.SaveProductAssignment({
+            CategoryID: vm.Category.ID,
+            ProductID: ItemID
+        }).then(function() {
+
+
+            OrderCloud.Products.Get(ItemID).then(function(prod) {
+                if (!prod.xp) {
+                    prod.xp = { "Product-Group": "", "Master-Group": "" };
+                }
+
+                prod.xp["Product-Group"] = vm.Category.ID;
+
+                try {
+                    prod.xp["Master-Group"] = vm.Category.xp["Master-Group"];
+                } catch (e) {}
+
+                OrderCloud.Products.Update(ItemID, prod);
+
+                SelectedCategory.xp.ProductCount = vm.prodAssignments.Items.length;
+
+                OrderCloud.Categories.Update($stateParams.categoryid, SelectedCategory)
+            });
+        });
+    }
 
     vm.research = function() {
         var paramObject = {};
@@ -816,19 +763,19 @@ function ProductGroupAssignProductController($scope, OrderCloud, FullOrderCloud,
                         OrderCloud.Products.List(keywords, 1, 100, searchby, null, paramObject).then(function(d2) {
                             var _data = d2;
                             _data.Items = _data.Items.filter(function(current) {
-                                return vm.prodAssignments.Items.filter(function(current_b) {
+                                return ProductAssignments.Items.filter(function(current_b) {
                                     return current_b.ID === current.ID;
                                 }).length === 0;
                             });
 
                             if (vm.listFilter) {
-                                vm.list = _data;
+                                vm.list = d2;
                             }
                         });
                     });
 
                 });
-        }, 100);
+        }, 10);
 
     };
     vm.selectAll = function() {
@@ -909,7 +856,7 @@ function ProductGroupAssignProductController($scope, OrderCloud, FullOrderCloud,
         OrderCloud.Categories.ListProductAssignments(null, pd.ID, 1, 100, null).then(function(data) {
             if (data.Items.length === 0) {
                 SaveFunc(pd.ID);
-                vm.prodAssignments.Items.unshift(pd);
+                vm.prodAssignments.Items.push(pd);
             } else {
 
                 OrderCloud.Categories.Get(data.Items[0].CategoryID, "product-groups").then(function(curCat) {
@@ -917,7 +864,7 @@ function ProductGroupAssignProductController($scope, OrderCloud, FullOrderCloud,
                     //if (result) {
                     OrderCloud.Categories.DeleteProductAssignment(vm.Category.ID, pd.ID, "product-groups").then(function() {
                         SaveFunc(pd.ID);
-                        vm.prodAssignments.Items.unshift(pd);
+                        vm.prodAssignments.Items.push(pd);
                     });
                     //}
                 });
@@ -937,7 +884,7 @@ function ProductGroupAssignProductController($scope, OrderCloud, FullOrderCloud,
         vm.prodAssignments.Items.splice(_Index, 1);
 
         DeleteFunc(pd.ID);
-        vm.list.Items.unshift(pd);
+        vm.list.Items.push(pd);
 
         OrderCloud.Products.Get(pd.ID).then(function(data) {
 
@@ -963,7 +910,33 @@ function ProductGroupAssignProductController($scope, OrderCloud, FullOrderCloud,
                 Type: "Product"
             }, 'CREATE');
             toastr.success('Assignment Added', 'Success');
+
+
+            OrderCloud.Products.Get(ItemID).then(function(prod) {
+                if (!prod.xp) {
+                    prod.xp = { "Product-Group": "", "Master-Group": "" };
+                }
+
+                prod.xp["Product-Group"] = vm.Category.ID;
+
+                try {
+                    prod.xp["Master-Group"] = vm.Category.xp["Master-Group"];
+                } catch (e) {}
+
+                OrderCloud.Products.Update(ItemID, prod);
+
+            });
         });
+
+
+
+
+
+
+
+
+
+
     }
 
     function DeleteFunc(ItemID) {
@@ -1001,13 +974,9 @@ function ProductGroupAssignSpecController($scope, OrderCloud, FullOrderCloud, As
     "use strict";
     var vm = this;
 
-
-
-
     vm.groupFilter = $stateParams.group;
-
-
     vm.Category = SelectedCategory;
+
     if (!vm.Category.xp) {
         vm.Category.xp = {};
     }
@@ -1025,21 +994,12 @@ function ProductGroupAssignSpecController($scope, OrderCloud, FullOrderCloud, As
         window.history.back();
     };
 
-
-
-    console.log(AssignedSpecs)
-
     vm.productAssignments = ProductAssignments;
     vm.SpecGroups = option_list.spec_groups;
     vm.SpecGroups.splice(0, 1);
-
-
-
     vm.updateAssignment = updateAssignment;
     vm.pagingfunction = PagingFunction;
-    vm.list = FullSpecList;
     vm.changedSpecs = {};
-    vm.assignedSpecs = AssignedSpecs;
 
     var searching;
     vm.research = function() {
@@ -1057,8 +1017,6 @@ function ProductGroupAssignSpecController($scope, OrderCloud, FullOrderCloud, As
 
 
             var _paramObject = jQuery.extend(true, {}, paramObject);
-            //    _paramObject.ID = IDs;
-
 
             OrderCloud.Categories.Get($stateParams.categoryid).then(
                 function(data) {
@@ -1099,7 +1057,7 @@ function ProductGroupAssignSpecController($scope, OrderCloud, FullOrderCloud, As
                         if (keys === undefined) {
                             keys = "";
                         }
-                        _paramObject.ID = keys
+                        _paramObject.ID = keys;
                         specCalls.push(OrderCloud.Specs.List(vm.searchFilter, 1, 100, null, null, _paramObject).then(function(response) {
                             var conCatArr = specs.Items.concat(response.Items);
                             specs.Items = conCatArr;
@@ -1133,12 +1091,16 @@ function ProductGroupAssignSpecController($scope, OrderCloud, FullOrderCloud, As
                     });
 
                 });
-
-
-
-
         }, 100);
     };
+
+
+    if ($stateParams.group) {
+        vm.research();
+    } else {
+        vm.list = FullSpecList;
+        vm.assignedSpecs = AssignedSpecs;
+    }
 
     dragulaService.options($scope, 'spec-bag', {
         moves: function(el, container, handle) {
@@ -1173,7 +1135,7 @@ function ProductGroupAssignSpecController($scope, OrderCloud, FullOrderCloud, As
 
         vm.list.Items.splice(_Index, 1);
         vm.updateAssignment(spec);
-        vm.assignedSpecs.Items.unshift(spec);
+        vm.assignedSpecs.Items.push(spec);
     };
 
     vm.pushBack = function(spec) {
@@ -1187,7 +1149,7 @@ function ProductGroupAssignSpecController($scope, OrderCloud, FullOrderCloud, As
 
         vm.assignedSpecs.Items.splice(_Index, 1);
         vm.updateAssignment(spec);
-        vm.list.Items.unshift(spec);
+        vm.list.Items.push(spec);
     };
 
 
@@ -1199,8 +1161,6 @@ function ProductGroupAssignSpecController($scope, OrderCloud, FullOrderCloud, As
                 "Type": "Product Group",
                 "TargetID": s.ID
             });
-            var auditTargets = [];
-            var specTargets = [];
 
             // create an object if needed
             if (!vm.Category.xp.specAssignments) {
@@ -1289,10 +1249,6 @@ function ProductGroupAssignSpecController($scope, OrderCloud, FullOrderCloud, As
         }
     }
 
-    function AssignmentFunc() {
-        return OrderCloud.Categories.ListProductAssignments(vm.Category.ID, null, 100);
-    }
-
     function PagingFunction() {
         return; //Paging.paging(vm.list, 'Specs', vm.list, function() {});
     }
@@ -1300,142 +1256,4 @@ function ProductGroupAssignSpecController($scope, OrderCloud, FullOrderCloud, As
     vm.specSelectChange = function(s) {
         s.selected === true ? vm.changedSpecs[s.ID] = s : vm.changedSpecs[s.ID] = 'delete';
     };
-}
-
-function ProductGroupTree() {
-    "use strict";
-    return {
-        restrict: 'E',
-        replace: true,
-        scope: {
-            tree: '='
-        },
-        template: "<ul><category-node ng-repeat='node in tree' node='node'></category-node></ul>"
-    };
-}
-
-function ProductGroupNode($compile) {
-    "use strict";
-    return {
-        restrict: 'E',
-        replace: true,
-        scope: {
-            node: '='
-        },
-        template: '<li><a ui-sref="base.adminCategories.edit({id:node.ID})" ng-bind-html="node.Name"></a></li>',
-        link: function(scope, element) {
-            if (angular.isArray(scope.node.children)) {
-                element.append("<category-tree tree='node.children' />");
-                $compile(element.contents())(scope);
-            }
-        }
-    };
-}
-
-function ProductGroupTreeService($q, Underscore, OrderCloud) {
-    "use strict";
-    return {
-        GetCategoryTree: tree,
-        UpdateCategoryNode: update
-    };
-
-    function tree() {
-        var tree = [];
-        var deferred = $q.defer();
-        OrderCloud.Categories.List(null, 1, 100, null, null, null, null, 'all')
-            .then(function(list) {
-                angular.forEach(Underscore.where(list.Items, {
-                    ParentID: null
-                }), function(node) {
-                    tree.push(getnode(node));
-                });
-
-                function getnode(node) {
-                    var children = Underscore.where(list.Items, {
-                        ParentID: node.ID
-                    });
-                    if (children.length > 0) {
-                        node.children = children;
-                        angular.forEach(children, function(child) {
-                            return getnode(child);
-                        });
-                    } else {
-                        node.children = [];
-                    }
-                    return node;
-                }
-
-                deferred.resolve(tree);
-            });
-        return deferred.promise;
-    }
-
-    function update(event) {
-        var sourceParentNodeList = event.source.nodesScope.$modelValue,
-            destParentNodeList = event.dest.nodesScope.$modelValue,
-            masterDeferred = $q.defer();
-
-        updateNodeList(destParentNodeList).then(function() {
-            if (sourceParentNodeList !== destParentNodeList) {
-                if (sourceParentNodeList.length) {
-                    updateNodeList(sourceParentNodeList).then(function() {
-                        updateParentID().then(function() {
-                            masterDeferred.resolve();
-                        });
-                    });
-                } else {
-                    updateParentID().then(function() {
-                        masterDeferred.resolve();
-                    });
-                }
-            }
-        });
-
-        function updateNodeList(nodeList) {
-            var deferred = $q.defer(),
-                nodeQueue = [];
-            angular.forEach(nodeList, function(cat, index) {
-                nodeQueue.push((function() {
-                    return OrderCloud.Categories.Patch(cat.ID, {
-                        ListOrder: index
-                    });
-                }));
-            });
-
-            var queueIndex = 0;
-
-            function run(i) {
-                nodeQueue[i]().then(function() {
-                    queueIndex++;
-                    if (queueIndex < nodeQueue.length) {
-                        run(queueIndex);
-                    } else {
-                        deferred.resolve();
-                    }
-                });
-            }
-            run(queueIndex);
-
-            return deferred.promise;
-        }
-
-        function updateParentID() {
-            var deferred = $q.defer(),
-                parentID;
-
-            if (event.dest.nodesScope.node) {
-                parentID = event.dest.nodesScope.node.ID;
-            } else {
-                parentID = null;
-            }
-            event.source.nodeScope.node.ParentID = parentID;
-            OrderCloud.Categories.Update(event.source.nodeScope.node.ID, event.source.nodeScope.node)
-                .then(function() {
-                    deferred.resolve();
-                });
-            return deferred.promise;
-        }
-
-        return masterDeferred.promise;
-    }
 }

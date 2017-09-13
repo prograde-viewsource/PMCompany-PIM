@@ -3,10 +3,10 @@
         <div class="form-group">
             <H4 style="width: 100%; text-align:center;">{{'Assign All Products?' | i18next}}</H4>
             <br/>
-            <button class="btn btn-default btn-primary" style="width: 100%" type="button" ng-click="select.visible(select)">{{'Assign Filtered Products' | i18next}} ({{select.scope.list.Meta.TotalCount}})</button><br><br>
+            <button class="btn btn-default btn-primary" style="width: 100%" type="button" ng-click="select.visible(select)">{{'Assign Filtered Products' | i18next}} ({{select.scope.list.Meta.TotalCount - select.scope.prodAssignments.Items.length }})</button><br><br>
             <button class="btn btn-default btn-primary" style="width: 100%" type="button" ng-click="select.all(select)">{{'Assign All Products' | i18next}} ({{select.scope.TotalCount}})</button><br><br>
             <button class="btn btn-default" style="width: 100%" type="button" ng-click="select.cancel()">{{'Cancel' | i18next}}</button>
-           <br> <em>WARNING: Bulk assignments can take several minnutes to complete.<br><br> Once started you can leave this page.</em>
+            <br> <em>WARNING: Bulk assignments can take several minnutes to complete.<br><br> Once started you can leave this page.</em>
         </div>
 
 

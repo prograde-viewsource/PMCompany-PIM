@@ -34,7 +34,7 @@ function AccountConfig($stateProvider) {
                         'client': clientsecret
                     }
                 };
-                return $http.get("https://pimaudit.azurewebsites.net/api/AuditLogs?page=" + Parameters.page + "", config)
+                return $http.get("https://pimaudit.azurewebsites.net/api/AuditLogs?page=" + Parameters.page + "", config);
             }
         }
     })

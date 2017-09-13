@@ -181,29 +181,29 @@ function MasterProductGroupsEditController($exceptionHandler, $state, OrderCloud
 
     vm.Delete = function() {
 
-        if(!SelectedCategory.xp['ProductGroups']){
+        if (!SelectedCategory.xp['ProductGroups']) {
             SelectedCategory.xp['ProductGroups'] = [];
         }
 
-     if (SelectedCategory.xp['ProductGroups'].length === 0) {
+        if (SelectedCategory.xp['ProductGroups'].length === 0) {
 
 
-                if (confirm("Are you sure you want to delete this Master Product Group?")) {
-                    OrderCloud.Categories.Delete(SelectedCategory.ID, 'master-product-groups')
-                        .then(function() {
-                            Audit.log("Master Product Group", SelectedCategory.Name, [{ "Type": "Master Product Group", "TargetID": categoryID }], 'DELETE');
-                            $state.go('masterproductgroups', {}, { reload: true });
-                            toastr.success('Master Product Group Deleted', 'Success');
-                        })
-                        .catch(function(ex) {
-                            $exceptionHandler(ex);
-                        });
-                }
-            } else {
-                alert('WARNING! - All Product Groups must be unassigned before a Master Product Group can be deleted')
+            if (confirm("Are you sure you want to delete this Master Product Group?")) {
+                OrderCloud.Categories.Delete(SelectedCategory.ID, 'master-product-groups')
+                    .then(function() {
+                        Audit.log("Master Product Group", SelectedCategory.Name, [{ "Type": "Master Product Group", "TargetID": categoryID }], 'DELETE');
+                        $state.go('masterproductgroups', {}, { reload: true });
+                        toastr.success('Master Product Group Deleted', 'Success');
+                    })
+                    .catch(function(ex) {
+                        $exceptionHandler(ex);
+                    });
             }
+        } else {
+            alert('WARNING! - All Product Groups must be unassigned before a Master Product Group can be deleted')
+        }
 
-    
+
 
     };
 
@@ -220,13 +220,13 @@ function MasterProductGroupsEditController($exceptionHandler, $state, OrderCloud
 function MasterProductGroupsCreateController($exceptionHandler, $state, OrderCloud, toastr, option_list, Audit) {
     "use strict";
     var vm = this;
-    vm.category = {xp:{}};
-       vm.category.xp = { "GroupProperties": [] };
+    vm.category = { xp: {} };
+    vm.category.xp = { "GroupProperties": [] };
     vm.options = option_list;
     vm.Submit = function(redirect) {
-  
-     
-    
+
+
+
         OrderCloud.Categories.Create(vm.category, 'master-product-groups').then(function(data) {
 
                 Audit.log("Mater Product Group", data.Name, [{ "Type": "Master Product Group", "TargetID": data.ID }], 'CREATE');
@@ -245,7 +245,7 @@ function MasterProductGroupsCreateController($exceptionHandler, $state, OrderClo
                 $exceptionHandler(ex);
             });
     };
-     vm.addGroupProp = function() {
+    vm.addGroupProp = function() {
         let tProp = { Name: vm.temp };
         vm.category.xp.GroupProperties.push(tProp);
         vm.temp = '';
@@ -261,16 +261,25 @@ function MasterProductGroupsAssignController($scope, OrderCloud, FullOrderCloud,
 
     vm.groupFilter = $stateParams.group;
 
-    var assingments = []
+    var assingments = [];
+    var idxToRemove = []
     fullCategoryList.Items.forEach(function(cat, idx) {
         assignedGroups.Items.forEach(function(assign) {
             if (cat.ID == assign.CategoryID) {
+
+                cat.Order = assign.Order;
                 assingments.push(cat);
-                fullCategoryList.Items.splice(idx, 1);
-                fullCategoryList.Meta.TotalCount--;
+                idxToRemove.push(idx)
             }
         });
     });
+    idxToRemove.sort(function(a, b) { return b - a });
+    console.log(idxToRemove);
+
+    idxToRemove.forEach(function(idx) {
+        fullCategoryList.Items.splice(idx, 1);
+    });
+
     assignedGroups.Items = assingments;
 
     vm.Category = SelectedCategory;
@@ -318,7 +327,7 @@ function MasterProductGroupsAssignController($scope, OrderCloud, FullOrderCloud,
     });
 
     $scope.$on('spec-bag.drop-model', function(e, elScope, target, source) {
-        vm.updateAssignment(elScope);
+        vm.saveAssignment();
     });
 
     vm.toggleListFilter = function() {
@@ -363,67 +372,67 @@ function MasterProductGroupsAssignController($scope, OrderCloud, FullOrderCloud,
 
 
         vm.list.Items.splice(_Index, 1);
-        vm.assignedGroups.Items.unshift(spec);
+        vm.assignedGroups.Items.push(spec);
 
         if (spec.xp['Master-Group'] != undefined && spec.xp['Master-Group'] != null && spec.xp['Master-Group'].ID != null && spec.xp['Master-Group'].Name != vm.Category.Name) {
             var result = confirm("Are you Sure you want to change the Assisnment of this Group? the current Master Product Group is - " + spec.xp['Master-Group'].Name);
             if (result) {
 
-                FullOrderCloud.Categories.ListProductAssignments( spec.ID, null, 1, 100, null).then(function(data) {
-                    data.Items.forEach(function(prodass){
-                         OrderCloud.Products.Get(prodass.ProductID).then(function(prod){
+                FullOrderCloud.Categories.ListProductAssignments(spec.ID, null, 1, 100, null).then(function(data) {
+                    data.Items.forEach(function(prodass) {
+                        OrderCloud.Products.Get(prodass.ProductID).then(function(prod) {
                             prod.xp['Master-Product-Group-XP'] = "";
                             prod.xp['Master-Group'] = vm.Category.Name;
                             OrderCloud.Products.Update(prod.ID, prod);
-                         });
+                        });
                     });
 
 
                     vm.saveAssignment();
-                 });
+                });
             }
 
         } else {
-             FullOrderCloud.Categories.ListProductAssignments(spec.ID, null, 1, 100, null).then(function(data) {
-            
-                    data.Items.forEach(function(prodass){
-                         OrderCloud.Products.Get(prodass.ProductID).then(function(prod){
-                            prod.xp['Master-Product-Group-XP'] = "";
-                            prod.xp['Master-Group'] = { ID: vm.Category.ID, Name: vm.Category.Name };
-                            OrderCloud.Products.Update(prod.ID, prod);
-                         });
+            FullOrderCloud.Categories.ListProductAssignments(spec.ID, null, 1, 100, null).then(function(data) {
+
+                data.Items.forEach(function(prodass) {
+                    OrderCloud.Products.Get(prodass.ProductID).then(function(prod) {
+                        prod.xp['Master-Product-Group-XP'] = "";
+                        prod.xp['Master-Group'] = { ID: vm.Category.ID, Name: vm.Category.Name };
+                        OrderCloud.Products.Update(prod.ID, prod);
                     });
+                });
 
 
-                    vm.saveAssignment();
-                 });
-          
+                vm.saveAssignment();
+            });
+
         }
     };
 
     vm.pushBack = function(spec) {
         var _Index = 0;
 
-        angular.forEach(vm.assignedGroups.Items, function(sp, index) {
+        vm.assignedGroups.Items.forEach(function(sp, index) {
             if (sp.ID === spec.ID) { _Index = index; }
         });
 
         vm.assignedGroups.Items.splice(_Index, 1);
-        vm.list.Items.unshift(spec);
+        vm.list.Items.push(spec);
         spec.xp['Master-Group'] = null;
         OrderCloud.Categories.Update(spec.ID, spec, 'product-groups').then(function() {
-               FullOrderCloud.Categories.ListProductAssignments( spec.ID, null, 1, 100, null).then(function(data) {
-                  data.Items.forEach(function(prodass){
-                         OrderCloud.Products.Get(prodass.ProductID).then(function(prod){
-                            prod.xp['Master-Product-Group-XP'] = "";
-                            prod.xp['Master-Group'] = "";
-                            OrderCloud.Products.Update(prod.ID, prod);
-                         })
+            FullOrderCloud.Categories.ListProductAssignments(spec.ID, null, 1, 100, null).then(function(data) {
+                data.Items.forEach(function(prodass) {
+                    OrderCloud.Products.Get(prodass.ProductID).then(function(prod) {
+                        prod.xp['Master-Product-Group-XP'] = "";
+                        prod.xp['Master-Group'] = "";
+                        OrderCloud.Products.Update(prod.ID, prod);
                     })
+                })
 
 
-                    vm.saveAssignment();
-                 });
+                vm.saveAssignment();
+            });
         });
 
     };
@@ -432,8 +441,9 @@ function MasterProductGroupsAssignController($scope, OrderCloud, FullOrderCloud,
 
         var assingments = []
 
-        vm.assignedGroups.Items.forEach(function(assign) {
-            assingments.push({ CategoryID: assign.ID, Name: assign.Name });
+        vm.assignedGroups.Items.forEach(function(assign, idx) {
+            assign.Order = idx;
+            assingments.push({ CategoryID: assign.ID, Name: assign.Name, Order: assign.Order });
 
             OrderCloud.Categories.Get(assign.ID, 'product-groups')
                 .then(function(catA) {

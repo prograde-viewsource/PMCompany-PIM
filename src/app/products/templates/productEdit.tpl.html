@@ -89,7 +89,7 @@
         <div class="col-md-12 form-group">
             <uib-accordion close-others="true">
 
-                <div uib-accordion-group class="panel-default" template-url="products/templates/groupHeaderTemplate.tpl.html" heading="{{group.Name | i18next}}" ng-repeat="group in productEdit.specGroups | orderBy:productEdit.CustomListOrder">
+                <div uib-accordion-group class="panel-default" template-url="products/templates/groupHeaderTemplate.tpl.html" heading="{{group.Name | TempFixRegulation}}" ng-repeat="group in productEdit.specGroups | orderBy:productEdit.CustomListOrder">
                     <div ng-repeat="spec in group.Specs | orderBy: '-Name'">
                         <div class="form-group col-sm-10">
                             <label style="display: block" ng-if="spec.OptionCount == 0 || (spec.OptionCount > 0 && !spec.xp.Multiselect)">{{spec.Name}}<span ng-show="spec.Required">*</span></label>

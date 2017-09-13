@@ -53,7 +53,7 @@ function PagingHelpers($q, OrderCloud, Assignments) {
     }
 
     // AG - added 1/12/17 to accomodate filtered pagining 
-    function filteredPagingFunction(ListObject, ServiceName, searchValue, paramObject) {
+    function filteredPagingFunction(ListObject, ServiceName, searchValue, paramObject, assigned = null) {
         var Service = OrderCloud[ServiceName];
         console.log(Service);
         console.log(ListObject.Meta);
@@ -73,7 +73,24 @@ function PagingHelpers($q, OrderCloud, Assignments) {
             $q.all(queue).then(function(results) {
                 dfd.resolve();
                 ListObject.Meta = results[0].Meta;
-                ListObject.Items = [].concat(ListObject.Items, results[0].Items);
+
+                if (assigned == null) {
+                    ListObject.Items = [].concat(ListObject.Items, results[0].Items);
+                } else {
+
+                    ListObject.Items = [].concat(ListObject.Items, results[0].Items);
+
+                    ListObject.Items = ListObject.Items.filter(function(current) {
+                        return assigned.Items.filter(function(current_b) {
+                            return current_b.ID === current.ID;
+                        }).length === 0;
+
+                    });
+
+                    ListObject.Items = _.uniq(ListObject.Items, function(item, key, a) {
+                        return item.ID;
+                    });
+                }
                 if (results[1]) {
                     AssignmentObjects.Meta = results[1].Meta;
                     AssignmentObjects.Items = [].concat(AssignmentObjects.Items, results[1].Items);

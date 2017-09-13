@@ -16,7 +16,7 @@
         </select>
     </div>
     <div class="col-md-4">
-        <label>Filter by Search:</label>
+        <label>Filter by Search:</label><em ng-if="categoryAssignProd.searchby == 'xp.Master-Product-Group-XP'" style="opacity:.75; font-size: 11px;  float: right;"> *Use AND, OR and NOT to combine search terms</em>
         <div class="form-group">
             <input type="search" class="form-control" placeholder="Search Products..." ng-model="categoryAssignProd.searchFilter" ng-change="categoryAssignProd.research()" parse-slash />
         </div>
@@ -62,7 +62,7 @@
 </div>
 <div class="row">
     <div class="col-xs-6">
-        <div class='scroll-count'>Showing <strong>{{categoryAssignProd.list.Items.length}}</strong> of <strong>{{ categoryAssignProd.list.Items.length > 0 ? categoryAssignProd.list.Meta.TotalCount : 0}}</strong></div>
+        <div class='scroll-count'>Showing <strong>{{categoryAssignProd.list.Items.length}}</strong> of <strong>{{ categoryAssignProd.list.Items.length > 0 ? categoryAssignProd.list.Meta.TotalCount - categoryAssignProd.prodAssignments.Items.length : 0}}</strong></div>
         <section class="table-fixed-header no-margin">
             <div class="table-header-bg"></div>
             <div class="table-container" ordercloud-infinite-scroll servicename="Products" pagingfunction="LeftPagingFunction" controlleras="categoryAssignProd" idname="ID" disable-dynamic-validation ng-style="categoryAssignProd.leftDragColMaxheight">
@@ -103,7 +103,7 @@
         <div class='scroll-count'>Showing <strong>{{categoryAssignProd.prodAssignments.Items.length}}</strong> of <strong>{{categoryAssignProd.prodAssignments.Items.length > 0 ? categoryAssignProd.prodAssignments.Meta.TotalCount  : 0 }}</strong></div>
         <section class="table-fixed-header no-margin">
             <div class="table-header-bg"></div>
-            <div class="table-container" ordercloud-infinite-scroll servicename="products" pagingfunction="RightPagingFunction" controlleras="categoryAssignProd" idname="ID" disable-dynamic-validation ng-style="categoryAssignProd.leftDragColMaxheight">
+            <div class="table-container" ordercloud-infinite-scroll servicename="products" controlleras="categoryAssignProd" idname="ID" disable-dynamic-validation ng-style="categoryAssignProd.leftDragColMaxheight">
                 <table class="table table-hover">
                     <colgroup>
                         <col class="action-column" />

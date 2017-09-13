@@ -131,17 +131,19 @@ function DataManagerConfig($stateProvider) {
                 DataJobList: function(OrderCloud, Buyer) {
                     return OrderCloud.Categories.List(null, 1, 100, null, null, null, null, 'datamanager');
                 },
-                ProductList: function(OrderCloud, FullOrderCloud, Assignments, $stateParams) {
-                    var IDs = "!000";
-                    angular.forEach(Assignments.Items, function(item) {
-                        IDs += "_amp_id_eq_!" + item.ProductID + "|";
-                    });
-                    IDs = IDs.substr(0, IDs.length - 1);
+                ProductList: ["OrderCloud", "FullOrderCloud", "Helpers", "$q", "$stateParams", "ProductAssignments", function ProductList(OrderCloud, FullOrderCloud, Helpers, $q, $stateParams, ProductAssignments) {
+                    return FullOrderCloud.Products.List(null, 1, 100, null, null, null).then(function(_data) {
+                        _data.Items = _data.Items.filter(function(current) {
 
-                    return OrderCloud.Products.List(null, 1, 100, null, null, {
-                        //'ID': IDs
+
+
+                            return ProductAssignments.Items.filter(function(current_b) {
+                                return current_b.ID === current.ID;
+                            }).length === 0;
+                        });
+                        return _data;
                     });
-                },
+                }],
                 ProductBuyerAssignments: function($stateParams, OrderCloud, Buyer) {
                     return OrderCloud.Products.ListAssignments(null, null, null, null, null, null, 100, Buyer.DefaultCatalogID);
                 },
@@ -247,9 +249,10 @@ function SelectDialogController($scope, $uibModalInstance, Audit, $i18next, toas
     var vm = this;
     vm.scope = Scope;
     vm.all = function() {
+        console.log(Scope);
         toastr.success("Processing Requests. Please wait.");
         Scope.application.apiAgentService.assignAllProductsToCategory(Scope.buyer.ID, Scope.Category.ID, {
-            catalogID: Scope.buyer.ID
+            catalogID: "datamanager"
         });
 
         angular.forEach(Scope.list.Items, function(product) {
@@ -261,7 +264,7 @@ function SelectDialogController($scope, $uibModalInstance, Audit, $i18next, toas
         });
 
         Scope.prodAssignments.Meta = Scope.list.Data;
-        Scope.prodAssignments.Items.unshift.apply(Scope.prodAssignments.Items, Scope.list.Items);
+        Scope.prodAssignments.Items.push.apply(Scope.prodAssignments.Items, Scope.list.Items);
         Scope.list.Items = [];
         $uibModalInstance.close();
     };
@@ -271,7 +274,7 @@ function SelectDialogController($scope, $uibModalInstance, Audit, $i18next, toas
         // Scope.paramObject.catalogID = 'datamanager';
         delete Scope.paramObject.ID;
         Scope.application.apiAgentService.assignAllProductsToCategory('datamanager', Scope.DataJob.ID, Scope.paramObject, Scope.searchFilter);
-        Scope.prodAssignments.Items.unshift.apply(Scope.prodAssignments.Items, Scope.list.Items);
+        Scope.prodAssignments.Items.push.apply(Scope.prodAssignments.Items, Scope.list.Items);
         Scope.list.Items = [];
         Scope.prodAssignments.Meta = angular.copy(Scope.list.Meta);
         Scope.list.Meta.TotalCount = 0;
@@ -301,7 +304,7 @@ function DeselectDialogController($scope, $uibModalInstance, Audit, $i18next, to
         });
 
 
-        Scope.list.Items.unshift.apply(Scope.list.Items, Scope.prodAssignments.Items);
+        Scope.list.Items.push.apply(Scope.list.Items, Scope.prodAssignments.Items);
         Scope.prodAssignments.Items = [];
         Scope.list.Meta.ItemRange[1] = Scope.list.Items.length;
         Scope.TotalCount = Scope.list.Items.length;
@@ -397,7 +400,7 @@ function DataManagerController($state, option_list, $ocMedia, OrderCloud, OrderC
         $rootScope.$emit('$stateChangeStart', $state);
         $http({
             method: 'POST',
-            url: 'https://pim-report.azurewebsites.net/CategoryReport?secret=' + clientsecret + '&BuyerID=datamanager' + '&CategoryID=' + cat.ID,
+            url: 'https://pim-report.azurewebsites.net/CategoryReport?secret=' + clientsecret + '&BuyerID=datamanager' + '&CategoryID=' + cat.ID + '&vnext=true',
 
         }).then(function successCallback(response) {
             toastr.success('Distribution Template Ordered', 'Success');
@@ -481,7 +484,7 @@ function DataJobProcessController($rootScope, $exceptionHandler, $state, $http, 
         $rootScope.$emit('$stateChangeSuccess', $state);
         $http({
             method: 'POST',
-            url: 'http://localhost:60163/api/datajob',
+            url: 'https://pimbulkapi.azurewebsites.net/api/datajob',
             data: report,
             headers: {
                 'client': clientsecret
@@ -884,7 +887,7 @@ function DataJobAssignProductController($scope, $stateParams, OrderCloud, option
             }
         });
         vm.list.Items.splice(_Index, 1);
-        vm.prodAssignments.Items.unshift(pd);
+        vm.prodAssignments.Items.push(pd);
         SaveFunc(pd.ID);
     };
 
@@ -896,7 +899,7 @@ function DataJobAssignProductController($scope, $stateParams, OrderCloud, option
             }
         });
         vm.prodAssignments.Items.splice(_Index, 1);
-        vm.list.Items.unshift(pd);
+        vm.list.Items.push(pd);
         DeleteFunc(pd.ID);
     };
 
@@ -1047,16 +1050,20 @@ function DataJobAssignSpecController($scope, toastr, OrderCloud, Paging, SpecLis
     var searching;
 
     vm.research = function() {
-        if (searching) {
-            $timeout.cancel(searching);
+
+        if (vm.groupFilter === null) {
+            vm.groupFilter = undefined;
         }
+
+        if (searching) { $timeout.cancel(searching); }
         searching = $timeout(function() {
             if (vm.searchInput !== '') {
                 vm.searchFilter = vm.searchInput;
             } else {
-                vm.searchFilter = null;
+                vm.searchFilter = undefined;
             }
         }, 300);
+
     };
 
     vm.toggleListFilter = function() {

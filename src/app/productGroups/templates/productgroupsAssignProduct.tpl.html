@@ -8,7 +8,7 @@
 </div>
 <div class="row">
     <div class="col-md-4">
-        <label>Filter by Search:</label>
+        <label>Filter by Search:</label><em ng-if="productgroupsAssignProd.searchby == 'xp.Master-Product-Group-XP'" style="opacity:.75; font-size: 11px;  float: right;"> *Use AND, OR and NOT to combine search terms</em>
         <div class="form-group">
             <input type="search" class="form-control" placeholder="Search Products..." ng-model="productgroupsAssignProd.searchFilter" ng-change="productgroupsAssignProd.research()" parse-slash />
         </div>
@@ -62,7 +62,7 @@
                     <colgroup>
                         <col class="action-column" />
                     </colgroup>
-                    <thead>
+                    <thead ng-if="productgroupsAssignProd.list.Items.length">
                         <tr>
                             <th class="tool-th">
                                 <div class="tool-div">
@@ -86,7 +86,7 @@
                             <td data-title="Name">{{spec.Name | slashify}}</td>
                         </tr>
                         <tr ng-if="!productgroupsAssignProd.list.Items.length">
-                            <td class="alert alert-info" colspan="2">No matches found.</td>
+                            <td class="alert alert-info" colspan="3">No matches found.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -102,7 +102,7 @@
                     <colgroup>
                         <col class="action-column" />
                     </colgroup>
-                    <thead>
+                    <thead ng-if="productgroupsAssignProd.prodAssignments.Items.length">
                         <tr>
                             <th class="tool-th">
                                 <div class="tool-div" style="left: 5px; display:none;">
@@ -125,7 +125,7 @@
                             <td data-title="Name">{{spec.Name | slashify}}</td>
                         </tr>
                         <tr ng-if="!productgroupsAssignProd.prodAssignments.Items.length">
-                            <td class="alert alert-info" colspan="2">No matches found.</td>
+                            <td class="alert alert-info" colspan="3">No matches found.</td>
                         </tr>
                     </tbody>
                 </table>

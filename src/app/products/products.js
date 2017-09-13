@@ -34,8 +34,6 @@ function ProductsConfig($stateProvider) {
                     return OrderCloudParameters.Get($stateParams);
                 },
                 ProductList: function(OrderCloud, Parameters) {
-
-                    console.log('--------------------------------------------------------')
                     return OrderCloud.Products.List(Parameters.search, Parameters.page, Parameters.pageSize || 50, Parameters.searchOn, Parameters.sortBy, Parameters.filters);
                 },
                 /*  ProductUpdate: function(OrderCloud, FullOrderCloud, Parameters) {
@@ -118,7 +116,7 @@ function ProductsConfig($stateProvider) {
                     return FullOrderCloud.Specs.ListProductAssignments(null, $stateParams.productid);
                 },
                 MasterProductGroupXP: function(OrderCloud, SelectedProduct, ProductGroup) {
-                    if (ProductGroup.xp != null && ProductGroup.xp['Master-Group'] !== undefined) {
+                    if (ProductGroup.xp['Master-Group']) {
                         SelectedProduct.xp['Master-Group'] = ProductGroup.xp['Master-Group'];
                         return OrderCloud.Categories.Get(ProductGroup.xp['Master-Group'].ID, 'master-product-groups')
                     } else {
@@ -130,7 +128,7 @@ function ProductsConfig($stateProvider) {
                     if (SelectedProduct.xp['Product-Group']) {
                         return OrderCloud.Categories.Get(SelectedProduct.xp['Product-Group'], 'product-groups');
                     } else {
-                        return OrderCloud.Categories.Get("unspecified", 'product-groups');
+                        return OrderCloud.Categories.Get("fNLP0WEWw0KTv8PRmk1uKw", 'product-groups');
                     }
 
                 },
@@ -244,8 +242,7 @@ function ProductsController($state, $ocMedia, erp_as_product_name, OrderCloud, O
     vm.productGroups = ProductGroups;
     vm.sortSelection = Parameters.sortBy ? (Parameters.sortBy.indexOf('!') === 0 ? Parameters.sortBy.split('!')[1] : Parameters.sortBy) : null;
     vm.options = option_list;
-    vm.pageSize = 50;
-    vm.searchFilter = null;
+
     vm.research = function() {
         var xpSearch = false;
         var paramObject = {};
@@ -274,11 +271,15 @@ function ProductsController($state, $ocMedia, erp_as_product_name, OrderCloud, O
             }
         }
         if (xpSearch) {
-            OrderCloud.Products.List(null, null, Parameters.pageSize || 50, null, null, paramObject)
+            OrderCloud.Products.List(vm.searchby, null, Parameters.pageSize || 50, null, null, null)
                 .then(function(data) {
                     vm.list = data;
                 });
         } else {
+
+            if (vm.searchby != '' && vm.searchFilter != '' && vm.searchFilter != undefined)
+                paramObject[vm.searchby] = "*" + vm.searchFilter + "*"; // "*" Fuzzy Search
+
             OrderCloud.Products.List(vm.searchFilter, null, Parameters.pageSize || 50, vm.searchby, null, paramObject)
                 .then(function(data) {
                     vm.list = data;
@@ -316,11 +317,6 @@ function ProductsController($state, $ocMedia, erp_as_product_name, OrderCloud, O
         vm.parameters.from = null;
         vm.parameters.to = null;
         vm.parameters.searchby = null;
-        vm.parameters.search = null;
-        vm.parameters.searchFilter = null;
-        vm.parameters.searchOn = null;
-        vm.parameters.sortBy = null;
-
         $ocMedia('max-width:767px') ? vm.parameters.sortBy = null : angular.noop(); //Clear out sort by on mobile devices
         vm.filter(true);
     };
@@ -389,12 +385,12 @@ function ProductsController($state, $ocMedia, erp_as_product_name, OrderCloud, O
 
     //Reload the state with the incremented page parameter
     vm.pageChanged = function() {
-        console.log(vm.searchFilter)
-        console.log(vm.list.Meta.Page)
-        console.log(vm.pageSize)
-        console.log(vm.parameters.searchOn)
-        console.log(vm.parameters.sortBy)
-        return OrderCloud.Products.List(vm.searchFilter, vm.list.Meta.Page, vm.pageSize, vm.parameters.searchOn, vm.parameters.sortBy, vm.parameters)
+
+        try {
+            delete vm.parameters.page;
+        } catch (e) {}
+
+        return OrderCloud.Products.List(vm.searchFilter, vm.list.Meta.Page, vm.pageSize || vm.list.Meta.PageSize, vm.parameters.searchOn, vm.parameters.sortBy, vm.parameters)
             .then(function(data) {
                 vm.list.Items = data.Items;
                 vm.list.Meta = data.Meta;
@@ -403,15 +399,13 @@ function ProductsController($state, $ocMedia, erp_as_product_name, OrderCloud, O
 
     //Load the next page of results with all of the same parameters
     vm.loadMore = function() {
-        console.log(vm.parameters)
-        return OrderCloud.Products.List(vm.searchFilter, vm.list.Meta.Page + 1, vm.pageSize || vm.list.Meta.PageSize, vm.parameters.searchOn, vm.parameters.sortBy, vm.parameters)
+
+        return OrderCloud.Products.List(vm.searchFilter, vm.list.Meta.Page + 1, vm.pageSize || vm.list.Meta.PageSize, vm.parameters.searchOn, vm.parameters.sortBy, null)
             .then(function(data) {
                 vm.list.Items = data.Items;
                 vm.list.Meta = data.Meta;
             });
     };
-
-    vm.clearFilters();
 }
 
 function ProductEditController($http, $exceptionHandler, erp_as_product_name, protected_fields, MasterProductGroupXP, $timeout, $state, OrderCloud, SelectedProduct, toastr, FullProduct, CategoryList, clientsecret, SpecAssignments, $scope, $q, FullProductService, $rootScope, option_list, Audit) {
@@ -419,7 +413,6 @@ function ProductEditController($http, $exceptionHandler, erp_as_product_name, pr
 
     var vm = this,
         productid;
-    console.log(protected_fields)
     vm.protected = protected_fields;
     vm.erp_as_product_name = erp_as_product_name;
     productid = angular.copy(SelectedProduct.ID);
@@ -835,10 +828,14 @@ function ProductEditController($http, $exceptionHandler, erp_as_product_name, pr
             OrderCloud.Specs.SaveProductAssignment(spec.Assignment);
             vm.windowOpen = false;
         };
-    }
+    };
+    $timeout(function() {
+        setMultiDrop();
+    });
+
 }
 
-function ProductCreateController($exceptionHandler, $http, clientsecret, option_list, $state, OrderCloud, toastr, CategoryList, $rootScope, $q, FullProductService, Audit, erp_as_product_name) {
+function ProductCreateController($exceptionHandler, $http, clientsecret, option_list, $state, $timeout, OrderCloud, toastr, CategoryList, $rootScope, $q, FullProductService, Audit, erp_as_product_name) {
     "use strict";
     var vm = this;
     vm.erp_as_product_name = erp_as_product_name;
@@ -1061,8 +1058,10 @@ function ProductCreateController($exceptionHandler, $http, clientsecret, option_
             OrderCloud.Specs.SaveProductAssignment(spec.Assignment);
             vm.windowOpen = false;
         };
-    }
-    vm.clearFilters();
+    };
+    $timeout(function() {
+        setMultiDrop();
+    });
 }
 
 function ProductCloneController($exceptionHandler, erp_as_product_name, $state, $http, clientsecret, OrderCloud, SelectedProduct, toastr, FullProduct, CategoryList, SpecAssignments, $scope, $q, FullProductService, $rootScope, option_list, Audit) {
@@ -1433,7 +1432,10 @@ function ProductCloneController($exceptionHandler, erp_as_product_name, $state, 
             }
 
         });
-    })
+    });
+    $timeout(function() {
+        setMultiDrop();
+    });
 }
 
 function ProductAssignmentsController($exceptionHandler, $http, erp_as_product_name, $q, $stateParams, $state, $scope, OrderCloud, SelectedProduct, Assignments, toastr, BuyerList, Paging, Underscore, Audit) {
@@ -1574,6 +1576,34 @@ function ProductAssignmentsController($exceptionHandler, $http, erp_as_product_n
                 });
         }
     }
+}
+
+
+function setMultiDrop() {
+    // Events
+    $('.dropdown-container')
+        .on('click', '.dropdown-button', function() {
+            $('.dropdown-list', $(this).parent()).toggle();
+        })
+        .on('input', '.dropdown-search', function() {
+            var target = $(this);
+            var search = target.val().toLowerCase();
+
+            if (!search) {
+                $('li').show();
+                return false;
+            }
+
+            $('li').each(function() {
+                var text = $(this).text().toLowerCase();
+                var match = text.indexOf(search) > -1;
+                $(this).toggle(match);
+            });
+        })
+        .on('change', '[type="checkbox"]', function() {
+            var numChecked = $('[type="checkbox"]:checked').length;
+            $('.quantity').text(numChecked || 'Any');
+        });
 }
 
 function sortByKey(array, key) {

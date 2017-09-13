@@ -41,12 +41,12 @@
 
             <section class="table-fixed-header no-margin">
                 <div class="table-header-bg"></div>
-                <div class="table-container" servicename="Specs" ordercloud-infinite-scroll controlleras="categoryAssignSpec" idname="SpecID" disable-dynamic-validation ng-style="categoryAssignSpec.leftDragColMaxheight">
+                <div class="table-container" servicename="Specs" controlleras="categoryAssignSpec" idname="SpecID" disable-dynamic-validation ng-style="categoryAssignSpec.leftDragColMaxheight">
                     <table class="table table-hover">
                         <colgroup>
                             <col class="action-column" />
                         </colgroup>
-                        <thead>
+                        <thead ng-if="filter.length">
                             <tr>
                                 <th class="tool-th">
                                     <div class="tool-div" style="left: 15px;">
@@ -66,7 +66,7 @@
                             </tr>
                         </thead>
                         <tbody dragula="'spec-bag'" dragula-model="categoryAssignSpec.list.Items" class="oc-table-responsive">
-                            <tr ng-repeat="spec in categoryAssignSpec.list.Items | filter: ( categoryAssignSpec.listFilter ? {xp: {'Group':categoryAssignSpec.groupFilter}} : undefined):true | filter: ( categoryAssignSpec.listFilter ? categoryAssignSpec.searchFilter : undefined) | orderBy:'Name' as filter">
+                            <tr ng-repeat="spec in categoryAssignSpec.list.Items | filter:   ( categoryAssignSpec.listFilter ? {xp: {'Group':categoryAssignSpec.groupFilter}} : undefined):true  | filter: {Name: ( categoryAssignSpec.listFilter ? categoryAssignSpec.searchFilter : undefined) }| orderBy:'Name' as filter  track by $index">
                                 <td class="text-center tool-td"><i id="handle" class="fa fa-arrows"></i> <i class="fa fa-caret-right" ng-click="categoryAssignSpec.pushOver(spec.ID)"></i></td>
                                 <td>
                                     {{spec.Name | slashify}}</td>
@@ -74,7 +74,7 @@
                                     {{spec.xp.CustomLabels[categoryAssignSpec.buyer.ID].Label}}
                                 </td>
                             </tr>
-                            <tr ng-if="!categoryAssignSpec.list.Items.length">
+                            <tr ng-if="!filter.length">
                                 <td class="alert alert-info" style="text-align: center;" colspan="3">No matches found.</td>
                             </tr>
                         </tbody>
@@ -93,7 +93,7 @@
                 <div class="table-header-bg"></div>
                 <div class="table-container" servicename="Specs" controlleras="categoryAssignSpec" idname="SpecID" disable-dynamic-validation ng-style="categoryAssignSpec.leftDragColMaxheight">
                     <table class="table table-hover">
-                        <thead>
+                        <thead ng-if="filtered.length">
                             <tr>
 
                                 <th class="tool-th" colspan="2">
@@ -115,11 +115,11 @@
                             </tr>
                         </thead>
                         <tbody dragula="'spec-bag'" dragula-model="categoryAssignSpec.assignments.Items" id="right-drag-col">
-                            <tr ng-repeat="spec in categoryAssignSpec.assignments.Items | filter: ( categoryAssignSpec.assignedFilter  ? {xp: {'Group':categoryAssignSpec.groupFilter}} : undefined):true  | filter: ( categoryAssignSpec.assignedFilter ? categoryAssignSpec.searchFilter : undefined) as filtered  track by $index"
+                            <tr ng-repeat="spec in categoryAssignSpec.assignments.Items | filter: ( categoryAssignSpec.assignedFilter  ? {xp: {'Group':categoryAssignSpec.groupFilter}} : undefined):true  | filter: {Name:  ( categoryAssignSpec.assignedFilter ? categoryAssignSpec.searchFilter : undefined)} as filtered  track by $index"
                                 ng-init="editMode = false">
 
-                                <td class="text-center tool-td"><i id="handle" class="fa fa-arrows"></i> <i class="fa fa-caret-left" ng-click="categoryAssignSpec.pushBack(spec.ID)"></i></td>
-                                <td class="text-center" style="color: #9e9a9a; width: 50px; font-size: 11px; "> {{ categoryAssignSpec.colLetter($index) }} </td>
+                                <td class="text-center tool-td"><i id="handle" class="fa fa-arrows"></i> <i class="fa fa-caret-left" ng-click="categoryAssignSpec.pushBack(spec.ID, $index)"></i></td>
+                                <td class="text-center" style="color: #9e9a9a; width: 50px; font-size: 11px; "> {{ categoryAssignSpec.colLetter(categoryAssignSpec.assignments.Items.indexOf(spec)) }} </td>
                                 <td> {{spec.Name | slashify}}</td>
                                 <td class="label-td">
                                     <input type="text" ng-show="spec.editMode" class="form-control" placeholder="" ng-show="spec.xp.CustomLabels" ng-model="spec.xp.CustomLabels[categoryAssignSpec.buyer.ID].Label" style="display: inline-block; width: 80%; height: 23px;" />
@@ -130,8 +130,8 @@
                                     <i class="fa fa-save" ng-show="spec.xp.CustomLabels[categoryAssignSpec.buyer.ID] && spec.editMode" ng-click="categoryAssignSpec.UpdateSpec(spec)" style="float:right;color: #22557a; padding: 5px 5px"></i>
                                 </td>
                             </tr>
-                            <tr ng-if="categoryAssignSpec.assignments.Items.length == 0">
-                                <td colspan="3" style="text-align: center;" class="alert alert-info">No matches found. Drag and arrange Product Attributes here.</td>
+                            <tr ng-if="!filtered.length">
+                                <td colspan="4" style="text-align: center;" class="alert alert-info">No matches found.</td>
                             </tr>
                         </tbody>
                     </table>

@@ -11,7 +11,7 @@
         </select>
     </div>
     <div class="col-md-6">
-        <label>Filter by Search:</label>
+        <label>Filter by Search:</label><em ng-if="categoryAdHoc.searchby == 'xp.Master-Product-Group-XP'" style="opacity:.75; font-size: 11px;  float: right;"> *Use AND, OR and NOT to combine search terms</em>
         <div class="form-group">
             <input type="search" class="form-control" placeholder="Search Products..." ng-model="categoryAdHoc.searchFilter" ng-change="categoryAdHoc.research()" parse-slash />
         </div>

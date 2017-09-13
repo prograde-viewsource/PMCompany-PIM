@@ -328,7 +328,7 @@ function dataJobProcessUpload($parse, Underscore, FileReader, FilesService, $htt
 
             $http({
                 method: 'POST',
-                url: 'http://localhost:60163/api/upload',
+                url: 'https://pimbulkapi.azurewebsites.net/api/upload',
                 data: data,
                 headers: {
                     "client": clientsecret,

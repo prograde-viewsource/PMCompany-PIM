@@ -4,7 +4,7 @@
         <h3>{{'Products' | i18next}}</h3>
     </div>
     <div class="row">
-       
+
         <div class="col-md-6 form-group">
             <label for="productGroupFilter">{{'Filter by Group' | i18next}}:</label>
             <select id="productGroupFilter" class="form-control" user-permissions pbit="1" pobj="products" ng-model="products.groupFilter" ng-change="products.research()" ng-options="option.ID as option.Name group by option.Type for option in products.productGroups">
@@ -12,19 +12,19 @@
     
         </select>
         </div>
- <div class="col-md-4">
-            <label>{{'Filter by Search' | i18next}}:</label>
+        <div class="col-md-4">
+            <label>{{'Filter by Search' | i18next}}: </label><em ng-if="products.searchby == 'xp.Master-Product-Group-XP'" style="opacity:.75; font-size: 11px;  float: right;"> *Use AND, OR and NOT to combine search terms</em>
             <div class="form-group">
                 <input type="search" class="form-control" user-permissions pbit="1" pobj="products" placeholder="{{'Search Products...' | i18next}}" ng-model="products.searchFilter" ng-change="products.research()" parse-slash />
             </div>
         </div>
         <div class="col-md-2 form-group">
-             
+
             <div class="col-md-1" style="padding: 0px; margin-top:25px;">
                 <div style="position: relative; left: -13px; top: 6px;"><strong>by</strong></div>
-                </div>
+            </div>
             <div class="col-md-11" style="padding: 0px; margin-top:25px;">
-            
+
                 <select id="statusFilter" class="form-control" user-permissions pbit="1" pobj="products" ng-model="products.searchby" ng-change="products.research()">
                     <option ng-repeat="opt in products.options.search_by" value="{{opt[0]}}">{{opt[1] | i18next}}</option>
                 </select>

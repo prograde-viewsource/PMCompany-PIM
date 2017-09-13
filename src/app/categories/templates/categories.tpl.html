@@ -52,27 +52,36 @@
             <thead>
                 <tr>
 
-                    <th scope="col">
+                    <th scope="col" style="width:200px">
                         <a href="#" role="button" ng-click="categories.updateSort('Name')">
                         Name
                         <i class="fa fa-caret-down" ng-show="categories.parameters.sortBy == 'Name'"></i>
                         <i class="fa fa-caret-up" ng-show="categories.parameters.sortBy == '!Name'"></i>
                     </a>
                     </th>
+                    <th style="width:20px;text-align:center">
+                        # Products
+                    </th>
+                    <th style="width:20px;text-align:center">
+                        # Attributes
+                    </th>
+
                     <th>
                     </th>
                 </tr>
             </thead>
             <tbody>
                 <tr ng-repeat="category in categories.list.Items track by $index">
-                    <td data-title="Name">{{category.Name}}</td>
+                    <td style="width:200px" data-title="Name"><strong>{{category.Name}}</strong></td>
+                    <td style="width:20px; text-align:center">{{category.ProductCount}}</td>
+                    <td style="width:20px; text-align:center">{{category.SpecCount}}</td>
                     <td class="actions-cell">
                         <button user-permissions pbit="4" pobj="templates" ui-sref=".edit({categoryid: category.ID})" class="btn btn-default btn-sm">Edit</button>
                         <button user-permissions pbit="2" pobj="templates" ui-sref=".clone({categoryid: category.ID})" class="btn btn-default btn-sm">Clone</button>
                         <button user-permissions pbit="4" pobj="templates" ui-sref=".assignProduct({categoryid: category.ID})" class="btn btn-default btn-sm">Assign Products</button>
                         <button user-permissions pbit="4" pobj="templates" ui-sref=".assignSpec({categoryid: category.ID})" class="btn btn-default btn-sm">Assign Product Attributes</button>
-                        <button user-permissions pbit="16" pobj="templates" ui-sref=".adhoc({categoryid: category.ID})" class="btn btn-success btn-sm">Run Ad Hoc</button>
-                        <button user-permissions pbit="16" pobj="templates" ng-click="categories.runTemplate(category)" class="btn btn-success btn-sm">Run Template</button>
+                        <button user-permissions pbit="16" pobj="templates" ui-sref=".adhoc({categoryid: category.ID})" ng-disabled="category.ProductCount == 0 || category.SpecCount == 0" class="btn btn-success btn-sm">Run Ad Hoc</button>
+                        <button user-permissions pbit="16" pobj="templates" ng-click="categories.runTemplate(category)" ng-disabled="category.ProductCount == 0 || category.SpecCount == 0" class="btn btn-success btn-sm">Run Template</button>
                     </td>
                 </tr>
             </tbody>

@@ -17,7 +17,7 @@
 
         </div>
         <div class="col-md-6">
-            <label>Filter by Search:</label>
+            <label>Filter by Search:</label><em ng-if="DataJobAssignSpec.searchby == 'xp.Master-Product-Group-XP'" style="opacity:.75; font-size: 11px;  float: right;"> *Use AND, OR and NOT to combine search terms</em>
             <div class="form-group">
                 <input type="search" class="form-control" placeholder="Search Product Attributes..." ng-model="DataJobAssignSpec.searchInput" ng-change="DataJobAssignSpec.research()" />
             </div>
@@ -57,7 +57,7 @@
                             </tr>
                         </thead>
                         <tbody dragula="'spec-bag'" dragula-model="DataJobAssignSpec.list.Items" class="oc-table-responsive">
-                            <tr ng-repeat="spec in DataJobAssignSpec.list.Items | filter: ( DataJobAssignSpec.listFilter ? {xp: {'Group':DataJobAssignSpec.groupFilter.Name}} : null):true | filter: ( DataJobAssignSpec.listFilter ? DataJobAssignSpec.searchFilter : null) | orderBy:'Name' as filter">
+                            <tr ng-repeat="spec in DataJobAssignSpec.list.Items | filter: ( DataJobAssignSpec.listFilter ? {xp: {'Group':DataJobAssignSpec.groupFilter}} : null):true | filter: ( DataJobAssignSpec.listFilter ? DataJobAssignSpec.searchFilter : null) | orderBy:'Name' as filter">
                                 <td class="text-center tool-td"><i id="handle" class="fa fa-arrows"></i> <i class="fa fa-caret-right" ng-click="DataJobAssignSpec.pushOver(spec.ID)"></i></td>
                                 <td>{{spec.Name}}</td>
                             </tr>
@@ -97,7 +97,7 @@
                             <td>{{'Part Number' | i18next}}</td>
                         </tr>
                         <tbody dragula="'spec-bag'" dragula-model="DataJobAssignSpec.DataJob.xp.specAssignments" id="right-drag-col">
-                            <tr ng-repeat="spec in DataJobAssignSpec.DataJob.xp.specAssignments.Items | filter: ( DataJobAssignSpec.assignedFilter ? {xp: {'Group':DataJobAssignSpec.groupFilter.Name}} : null):true | filter: ( DataJobAssignSpec.assignedFilter ? DataJobAssignSpec.searchFilter : null) track by $index">
+                            <tr ng-repeat="spec in DataJobAssignSpec.DataJob.xp.specAssignments.Items | filter: ( DataJobAssignSpec.assignedFilter ? {xp: {'Group':DataJobAssignSpec.groupFilter}} : null):true | filter: ( DataJobAssignSpec.assignedFilter ? DataJobAssignSpec.searchFilter : null) track by $index">
                                 <td class="text-center tool-td"><i id="handle" class="fa fa-arrows"></i> <i class="fa fa-caret-left" ng-click="DataJobAssignSpec.pushBack(spec.ID)"></i></td>
                                 <td class="text-center" style="color: #9e9a9a; width: 50px; font-size: 11px; "> {{ DataJobAssignSpec.colLetter($index + 1) }} </td>
                                 <td>{{spec.Name}}</td>

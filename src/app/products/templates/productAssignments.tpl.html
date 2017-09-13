@@ -20,21 +20,22 @@
             <thead>
                 <tr>
                     <th>
-                        <div ng-click="productAssignments.sortBy('Name')">Name <span class="sortorder" ng-show="productAssignments.propertyName === 'Name'" ng-class="{reverse: productAssignments.reverse}"></span></div>
+                        <div class="input-group">
+                            <label class="text-center" ng-click="productAssignments.sortBy('selected')">
+                                <span class="sortorder" ng-show="productAssignments.propertyName === 'selected'" ng-class="{reverse: productAssignments.reverse}"></span></label>
+                        </div>
                     </th>
                     <th>
-                        <div class="input-group">
-                            <label class="text-center" ng-click="productAssignments.sortBy('selected')">Assigned <input type="checkbox" ng-change="productAssignments.toggleSelectAll()" ng-model="productAssignments.selectAll" /><span class="sortorder" ng-show="productAssignments.propertyName === 'selected'" ng-class="{reverse: productAssignments.reverse}"></span></label>
-                        </div>
+                        <div ng-click="productAssignments.sortBy('Name')">{{'Channel' | i18next}} <span class="sortorder" ng-show="productAssignments.propertyName === 'Name'" ng-class="{reverse: productAssignments.reverse}"></span></div>
                     </th>
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="buyer in productAssignments.list.Items | orderBy:productAssignments.propertyName:productAssignments.reverse track by $index" ng-if="buyer.ID !== 'orderagent'">
-                    <td>{{buyer.Name}}</td>
-                    <td>
+                <tr ng-repeat="buyer in productAssignments.list.Items | orderBy:'Name' track by $index" ng-if="buyer.ID !== 'orderagent'">
+                    <td style="width: 80px; text-align:center;">
                         <input name="{{'product_assign_' + $index}}" type="checkbox" ng-model="buyer.selected">
                     </td>
+                    <td>{{buyer.Name}}</td>
                 </tr>
             </tbody>
         </table>

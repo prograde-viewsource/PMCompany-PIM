@@ -14,7 +14,7 @@
         </select>
     </div>
     <div class="col-md-4">
-        <label>Filter by Search:</label>
+        <label>Filter by Search:</label><em ng-if="channelProducts.searchby == 'xp.Master-Product-Group-XP'" style="opacity:.75; font-size: 11px;  float: right;"> *Use AND, OR and NOT to combine search terms</em>
         <div class="form-group">
             <input type="search" class="form-control" placeholder="Search Products..." ng-model="channelProducts.searchFilter" ng-change="channelProducts.research()" parse-slash />
         </div>
@@ -60,7 +60,7 @@
 
 <div class="row">
     <div class="col-xs-6">
-        <div class='scroll-count'>Showing <strong>{{channelProducts.list.Items.length}}</strong> of <strong>{{channelProducts.list.Meta.TotalCount - channelProducts.assignments.Meta.TotalCount > 0 ? channelProducts.list.Meta.TotalCount - channelProducts.assignments.Meta.TotalCount : 0}}</strong></div>
+        <div class='scroll-count'>Showing <strong>{{channelProducts.list.Items.length}}</strong> of <strong>{{channelProducts.list.Meta.TotalCount - channelProducts.assignments.Items.length > 0 ? channelProducts.list.Meta.TotalCount - channelProducts.assignments.Items.length : 0}}</strong></div>
         <section class="table-fixed-header no-margin">
             <div class="table-header-bg"></div>
             <div class="table-container" ordercloud-infinite-scroll servicename="products" controlleras="channelProducts" pagingfunction="listPagingFunction" idname="productID" disable-dynamic-validation ng-style="channelProducts.leftDragColMaxheight">
@@ -103,7 +103,7 @@
         </section>
     </div>
     <div class="col-xs-6">
-        <div class='scroll-count'>Showing <strong>{{channelProducts.assignments.Items.length}}</strong> of <strong>{{channelProducts.assignments.Meta.TotalCount}}</strong></div>
+        <div class='scroll-count'>Showing <strong>{{channelProducts.assignments.Items.length}}</strong> of <strong>{{channelProducts.assignments.Items.length}}</strong></div>
         <section class="table-fixed-header no-margin">
             <div class="table-header-bg"></div>
             <div class="table-container" ordercloud-infinite-scroll servicename="products" controlleras="channelProducts" idname="productID" pagingfunction="assignmentPagingFunction" disable-dynamic-validation ng-style="channelProducts.leftDragColMaxheight">
@@ -131,7 +131,7 @@
                         </tr>
                     </thead>
                     <tbody dragula="'prod-bag'" dragula-model="channelProducts.assignments.Items" class="oc-table-responsive" id="right-drag-col">
-                        <tr ng-repeat="product in channelProducts.assignments.Items  track by $index ">
+                        <tr ng-repeat="product in channelProducts.assignments.Items ">
                             <td class="text-center tool-td"><i id="handle" class="fa fa-arrows"></i> <i class="fa fa-caret-left" ng-click="channelProducts.pushBack(product)"></i>
                                 <td data-title="ID" class="part-number-td">{{product.ID | slashify}}</td>
                                 <td data-title="Name">{{product.Name | slashify}}</td>

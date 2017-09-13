@@ -51,7 +51,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="props in masterproductgroupsEdit.category.xp.GroupProperties | orderBy: 'Value':specEdit._sortOptions  track by $index">
+                            <tr ng-repeat="props in masterproductgroupsEdit.category.xp.GroupProperties | orderBy: 'Name'  track by $index">
 
                                 <td ng-hide="canEdit" style="">{{props.Name}}</td>
                                 <td class="text-center" style="width: 10px;">
